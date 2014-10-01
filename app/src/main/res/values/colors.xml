@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="dark">#3e3e3e</color>
+    <color name="light">#BEBEBE</color>
+    <color name="active">#CEE0B1</color>
+</resources>

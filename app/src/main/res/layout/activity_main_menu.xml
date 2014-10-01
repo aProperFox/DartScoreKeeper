@@ -2,15 +2,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="games.ride.car.dartscorekeeper.MainMenu">
+    android:paddingTop="10sp"
+    android:paddingBottom="10sp"
+    tools:context="games.ride.car.dartscorekeeper.MainMenu"
+    android:orientation="vertical"
+    android:background="@color/light">
 
     <TextView
-        android:text="@string/hello_world"
+        android:id="@+id/title_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Let's Play Some Darts!"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textColor="@color/dark"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10sp"/>
+
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/player_selector"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/title_text"
+        android:layout_centerVertical="true"
+        android:layout_margin="10sp"/>
+
+    <TextView
+        android:id="@+id/instructional_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Click the board to begin"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textColor="@color/dark"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10sp"/>
+
+    <ImageView
+        android:id="@+id/dart_image"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:src="@drawable/dart_board"
+        android:layout_gravity="center"
+        android:onClick="clickBoard"
+        android:layout_below="@+id/player_selector"
+        android:layout_above="@id/instructional_text"
+        android:layout_margin="10sp"/>
 
 </RelativeLayout>
