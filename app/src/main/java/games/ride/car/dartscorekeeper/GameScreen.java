@@ -9,12 +9,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 
 public class GameScreen extends Activity {
 
     protected int turn;
     protected int buttonsPressed;
     protected boolean isGameOver;
+
+    protected final String[] scoreNames = {"20", "19", "18", "17", "16", "15", "bull"};
+    protected List<HashMap<String, String>> teamScores;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +61,17 @@ public class GameScreen extends Activity {
         }
 
         buttonsPressed = 0;
+
+        teamScores = (MainMenu.PLAYERS == 3)? new ArrayList<HashMap<String, String>>(3): new ArrayList<HashMap<String, String>>(2);
+
+        teamScores.add(new HashMap<String, String>());
+        teamScores.add(new HashMap<String, String>());
+        teamScores.get(0).put("score", "0");
+        teamScores.get(1).put("score", "0");
+        if(MainMenu.PLAYERS == 3) {
+            teamScores.add(new HashMap<String, String>());
+            teamScores.get(2).put("score", "0");
+        }
 
         isGameOver = false;
 
@@ -103,7 +121,9 @@ public class GameScreen extends Activity {
             hitPoints = Integer.parseInt(scoreName);
         }
 
-        int timesHit = textView.getText().length();
+        String scoreHit = teamScores.get(turn-1).get(scoreName);
+
+        int timesHit = (scoreHit != null && !scoreHit.isEmpty())? teamScores.get(turn-1).get(scoreName).length(): 0;
 
         String hitString = "";
 
@@ -114,6 +134,7 @@ public class GameScreen extends Activity {
             for(int i = 0; i < timesHit; i++) {
                 hitString += "X";
             }
+            teamScores.get(turn - 1).put(scoreName, hitString);
             textView.setText(hitString);
         } else {
 
@@ -123,35 +144,47 @@ public class GameScreen extends Activity {
 
                 for(int i = 1; i < 4; i++) {
                     if(i != turn) {
-                        score = (TextView) findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
 
-                        newScore = Integer.parseInt(score.getText().toString());
-                        newScore += hitPoints;
+                        String scoreClosed = teamScores.get(i-1).get(scoreName);
 
-                        score.setText("" + newScore);
+                        if(scoreClosed == null || scoreClosed.length() < 3) {
+
+                            score = (TextView) findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
+
+                            newScore = Integer.parseInt(score.getText().toString());
+                            newScore += hitPoints;
+
+                            score.setText("" + newScore);
+                            teamScores.get(i-1).put("score", "" + newScore);
+                        }
 
                     }
                 }
-                score = (TextView) findViewById(getResources().getIdentifier("team_" + turn + "_score", "id", getPackageName()));
-                newScore = Integer.parseInt(score.getText().toString());
+
 
             } else {
+                int otherTeam = (turn == 1)? 2: 1;
+                String scoreClosed = teamScores.get(otherTeam-1).get(scoreName);
 
-                String teamScoreId = team + "_score";
+                if(scoreClosed == null || scoreClosed.length() < 3) {
 
-                TextView score = (TextView) findViewById(getResources().getIdentifier(teamScoreId, "id", getPackageName()));
+                    String teamScoreId = team + "_score";
 
-                newScore = Integer.parseInt(score.getText().toString());
-                newScore += hitPoints;
+                    TextView score = (TextView) findViewById(getResources().getIdentifier(teamScoreId, "id", getPackageName()));
 
-                score.setText("" + newScore);
+                    newScore = Integer.parseInt(score.getText().toString());
+                    newScore += hitPoints;
+
+                    score.setText("" + newScore);
+                    teamScores.get(turn-1).put("score", ""+newScore);
+                }
             }
 
 
 
         }
 
-        checkForWin(newScore);
+        checkForWin();
 
     }
 
@@ -192,24 +225,20 @@ public class GameScreen extends Activity {
 
     }
 
-    public void checkForWin(int score) {
+    public void checkForWin() {
+        int score = Integer.parseInt(teamScores.get(turn-1).get("score"));
 
-        for(int i = 20; i > 13; i--) {
-            TextView textView;
-            if(i == 14) {
-                textView = (TextView)findViewById(getResources().getIdentifier("team_" + turn + "_bull", "id", getPackageName()));
-                if(textView.getText().toString().length() < 3) {
-                    return;
-                }
-            } else {
-                textView = (TextView)findViewById(getResources().getIdentifier("team_" + turn + "_" + i, "id", getPackageName()));
-                if(textView.getText().toString().length() < 3) {
-                    return;
-                }
+        System.out.println("SCore: " + score);
+
+        HashMap<String, String> playerMap = teamScores.get(turn-1);
+
+        for(int i = 0; i < scoreNames.length; i++) {
+            if (playerMap.get(scoreNames[i]) == null || playerMap.get(scoreNames[i]).length() < 3 ) {
+                return;
             }
         }
 
-        TextView scoreView = new TextView(this);
+
         int otherTeam = 0;
 
         Context context;
@@ -220,47 +249,47 @@ public class GameScreen extends Activity {
         switch (MainMenu.PLAYERS) {
             case 2:
                 otherTeam = (turn == 1)? 2 : 1;
-                System.out.println("Other team = " + otherTeam);
-                scoreView = (TextView)findViewById(getResources().getIdentifier("team_" + otherTeam + "_score", "id", getPackageName()));
 
-                if(score >= Integer.parseInt(scoreView.getText().toString())) {
+                if(score >= Integer.parseInt(teamScores.get(otherTeam - 1).get("score"))) {
                     context = getApplicationContext();
-                    playerName = getPreferences(0).getString("Player " + turn, "Player " + turn);
+                    playerName = getSharedPreferences(MainMenu.PREFERENCES, 0).getString("Player " + turn, "Player " + turn);
                     text = playerName + " Wins!";
 
                     Toast toast2 = Toast.makeText(context, text, duration);
                     toast2.show();
                     isGameOver = true;
+                    finish();
                 }
                 break;
 
             case 3:
                 for(int i = 1; i < 4; i++) {
-                    scoreView = (TextView)findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
-                    if(Integer.parseInt(scoreView.getText().toString()) < score)
+                    System.out.println("Score of " + i + " = " + teamScores.get(i-1).get("score") + ", Current score: " + score);
+                    if(Integer.parseInt(teamScores.get(i-1).get("score")) < score)
                         return;
                 }
                 context = getApplicationContext();
-                playerName = getPreferences(0).getString("Player " + turn, "Player " + turn);
+                playerName = getSharedPreferences(MainMenu.PREFERENCES, 0).getString("Player " + turn, "Player " + turn);
                 text = playerName + " Wins!";
 
                 Toast toast3 = Toast.makeText(context, text, duration);
                 toast3.show();
                 isGameOver = true;
+                finish();
 
                 break;
             case 4:
                 otherTeam = ((turn-1)>>1) + 1;
                 System.out.println("Other team = " + otherTeam);
-                scoreView = (TextView)findViewById(getResources().getIdentifier("team_" + otherTeam + "_score", "id", getPackageName()));
 
-                if(score >= Integer.parseInt(scoreView.getText().toString())) {
+                if(score >= Integer.parseInt(teamScores.get(otherTeam - 1).get("score"))) {
                     context = getApplicationContext();
                     text = "Team " + turn + " Wins!";
 
                     Toast toast4 = Toast.makeText(context, text, duration);
                     toast4.show();
                     isGameOver = true;
+                    finish();
                 }
 
                 break;
