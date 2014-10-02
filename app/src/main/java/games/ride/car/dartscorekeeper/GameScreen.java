@@ -23,6 +23,8 @@ public class GameScreen extends Activity {
     protected final String[] scoreNames = {"20", "19", "18", "17", "16", "15", "bull"};
     protected List<HashMap<String, String>> teamScores;
 
+    protected List<HashMap<String, String>> tempState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +76,19 @@ public class GameScreen extends Activity {
         }
 
         isGameOver = false;
+
+        tempState = (MainMenu.PLAYERS == 3)? new ArrayList<HashMap<String, String>>(3): new ArrayList<HashMap<String, String>>(2);
+
+        tempState.add(new HashMap<String, String>());
+        tempState.add(new HashMap<String, String>());
+        tempState.get(0).put("score", "0");
+        tempState.get(1).put("score", "0");
+        if(MainMenu.PLAYERS == 3) {
+            tempState.add(new HashMap<String, String>());
+            tempState.get(2).put("score", "0");
+        }
+
+        //Collections.copy(tempState, teamScores);
 
     }
 
@@ -136,6 +151,9 @@ public class GameScreen extends Activity {
             }
             teamScores.get(turn - 1).put(scoreName, hitString);
             textView.setText(hitString);
+            if(timesHit == 3) {
+                //textView.setTextColor(Color.rgb(176,53,53));
+            }
         } else {
 
             if(MainMenu.PLAYERS == 3) {
@@ -176,7 +194,7 @@ public class GameScreen extends Activity {
                     newScore += hitPoints;
 
                     score.setText("" + newScore);
-                    teamScores.get(turn-1).put("score", ""+newScore);
+                    teamScores.get(turn-1).put("score", "" + newScore);
                 }
             }
 
@@ -223,12 +241,16 @@ public class GameScreen extends Activity {
 
         buttonsPressed = 0;
 
+        tempState = new ArrayList<HashMap<String, String>>();
+        for(HashMap<String, String> hm: teamScores) {
+            tempState.add((HashMap<String, String>)hm.clone());
+        }
+
     }
 
     public void checkForWin() {
         int score = Integer.parseInt(teamScores.get(turn-1).get("score"));
 
-        System.out.println("SCore: " + score);
 
         HashMap<String, String> playerMap = teamScores.get(turn-1);
 
@@ -300,6 +322,48 @@ public class GameScreen extends Activity {
     public void onBackPressed(){
 
         finish();
+    }
+
+    public void undoMoves(View view) {
+
+        TextView textView = new TextView(this);
+        String tempText = "";
+
+        for(int i = 0; i < scoreNames.length; i++) {
+            textView = (TextView)findViewById(getResources().getIdentifier("team_" + turn + "_" + scoreNames[i], "id", getPackageName()));
+            tempText = tempState.get(turn-1).get(scoreNames[i]);
+            if(tempText == null)
+                tempText = "";
+            System.out.println("Temp text: " + tempText);
+            textView.setText(tempText);
+            teamScores.get(turn-1).put(scoreNames[i], tempText);
+        }
+
+        if(MainMenu.PLAYERS == 3) {
+            for(int i = 1; i < 4; i++) {
+                if(i != turn) {
+                    textView = (TextView) findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
+                    tempText = tempState.get(i-1).get("score");
+                    if(tempText == null)
+                        tempText = "";
+                    System.out.println("Temp text: " + tempText);
+                    textView.setText(tempText);
+                    teamScores.get(i-1).put("score", tempText);
+                }
+
+            }
+        } else {
+            textView = (TextView) findViewById(getResources().getIdentifier("team_" + turn + "_score", "id", getPackageName()));
+            tempText = tempState.get(turn-1).get("score");
+            if(tempText == null)
+                tempText = "";
+            System.out.println("Temp text: " + tempText);
+            textView.setText(tempText);
+            teamScores.get(turn-1).put("score", tempText);
+        }
+
+        buttonsPressed = 0;
+
     }
 
 }
