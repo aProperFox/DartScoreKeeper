@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainMenu"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +24,8 @@
         <activity
             android:name=".GameScreen"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:configChanges="orientation|keyboardHidden|screenSize">
 
         </activity>
 

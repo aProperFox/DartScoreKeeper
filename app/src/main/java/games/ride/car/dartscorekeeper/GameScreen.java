@@ -3,11 +3,14 @@ package games.ride.car.dartscorekeeper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,28 +32,24 @@ public class GameScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences preferences = getSharedPreferences(MainMenu.PREFERENCES, 0);
-
 
         if(MainMenu.PLAYERS == 3) {
-            setContentView(R.layout.activity_game_screen_3_columns);
-            TextView player3 = (TextView)findViewById(R.id.player3_name);
-            player3.setText(preferences.getString("Player 3", "Player 3"));
-        }
-        else {
-            setContentView(R.layout.activity_game_screen_2_columns);
-
-            if(MainMenu.PLAYERS == 4) {
-                TextView player3 = (TextView)findViewById(R.id.player3_name);
-                player3.setText(preferences.getString("Player 3", "Player 3"));
-                TextView player4 = (TextView)findViewById(R.id.player4_name);
-                player4.setText(preferences.getString("Player 4", "Player 4"));
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                setContentView(R.layout.activity_game_screen_3_columns_landscape);
+            } else {
+                setContentView(R.layout.activity_game_screen_3_columns_portrait);
             }
         }
-        TextView player1 = (TextView)findViewById(R.id.player1_name), player2 = (TextView)findViewById(R.id.player2_name);
+        else {
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                setContentView(R.layout.activity_game_screen_2_columns_landscape);
+            } else {
+                setContentView(R.layout.activity_game_screen_2_columns_portrait);
+            }
+        }
 
-        player1.setText(preferences.getString("Player 1", "Player 1"));
-        player2.setText(preferences.getString("Player 2", "Player 2"));
+        setPlayerNames();
+
 
         turn = 1;
 
@@ -138,7 +137,7 @@ public class GameScreen extends Activity {
 
         String scoreHit = teamScores.get(turn-1).get(scoreName);
 
-        int timesHit = (scoreHit != null && !scoreHit.isEmpty())? teamScores.get(turn-1).get(scoreName).length(): 0;
+        int timesHit = (scoreHit != null && !scoreHit.isEmpty())? StringUtils.countMatches(teamScores.get(turn - 1).get(scoreName), "X"): 0;
 
         String hitString = "";
 
@@ -148,6 +147,9 @@ public class GameScreen extends Activity {
             timesHit ++;
             for(int i = 0; i < timesHit; i++) {
                 hitString += "X";
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    hitString += "\n";
+                }
             }
             teamScores.get(turn - 1).put(scoreName, hitString);
             textView.setText(hitString);
@@ -165,7 +167,7 @@ public class GameScreen extends Activity {
 
                         String scoreClosed = teamScores.get(i-1).get(scoreName);
 
-                        if(scoreClosed == null || scoreClosed.length() < 3) {
+                        if(scoreClosed == null || StringUtils.countMatches(scoreClosed, "X") < 3) {
 
                             score = (TextView) findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
 
@@ -184,7 +186,7 @@ public class GameScreen extends Activity {
                 int otherTeam = (turn == 1)? 2: 1;
                 String scoreClosed = teamScores.get(otherTeam-1).get(scoreName);
 
-                if(scoreClosed == null || scoreClosed.length() < 3) {
+                if(scoreClosed == null || StringUtils.countMatches(scoreClosed, "X") < 3) {
 
                     String teamScoreId = team + "_score";
 
@@ -255,7 +257,7 @@ public class GameScreen extends Activity {
         HashMap<String, String> playerMap = teamScores.get(turn-1);
 
         for(int i = 0; i < scoreNames.length; i++) {
-            if (playerMap.get(scoreNames[i]) == null || playerMap.get(scoreNames[i]).length() < 3 ) {
+            if (playerMap.get(scoreNames[i]) == null || StringUtils.countMatches(playerMap.get(scoreNames[i]), "X") < 3 ) {
                 return;
             }
         }
@@ -363,6 +365,91 @@ public class GameScreen extends Activity {
         }
 
         buttonsPressed = 0;
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if(MainMenu.PLAYERS == 3) {
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                setContentView(R.layout.activity_game_screen_3_columns_landscape);
+
+            } else {
+                setContentView(R.layout.activity_game_screen_3_columns_portrait);
+            }
+
+            TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
+            activePlayer.setBackground(getResources().getDrawable(R.color.active));
+        } else {
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                setContentView(R.layout.activity_game_screen_2_columns_landscape);
+
+            } else {
+                setContentView(R.layout.activity_game_screen_2_columns_portrait);
+            }
+            LinearLayout activePlayer = (LinearLayout)findViewById(getResources().getIdentifier("team_" + turn, "id", getPackageName()));
+            activePlayer.setBackground(getResources().getDrawable(R.color.active));
+        }
+
+        // Re-initialze view
+        TextView textView = new TextView(this);
+        String tempText = "";
+
+        int teamCount = (MainMenu.PLAYERS == 3)? MainMenu.PLAYERS: 2;
+
+        for(int j = 1; j <= teamCount; j++) {
+            for (int i = 0; i < scoreNames.length; i++) {
+                textView = (TextView) findViewById(getResources().getIdentifier("team_" + j + "_" + scoreNames[i], "id", getPackageName()));
+                tempText = teamScores.get(j - 1).get(scoreNames[i]);
+                if (tempText == null)
+                    tempText = "";
+                tempText = tempText.replace("\n", "");
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    tempText = tempText.replaceAll("X", "X\n");
+                }
+                textView.setText(tempText);
+            }
+        }
+
+        for(int i = 1; i <= teamCount; i++) {
+            textView = (TextView) findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
+            tempText = teamScores.get(i-1).get("score");
+            if(tempText == null)
+                tempText = "";
+            textView.setText(tempText);
+
+        }
+
+        setPlayerNames();
+
+
+    }
+
+    public void setPlayerNames() {
+
+        SharedPreferences preferences = getSharedPreferences(MainMenu.PREFERENCES, 0);
+
+        TextView player1 = (TextView)findViewById(R.id.player1_name), player2 = (TextView)findViewById(R.id.player2_name);
+
+        player1.setText(preferences.getString("Player 1", "Player 1"));
+        player2.setText(preferences.getString("Player 2", "Player 2"));
+
+        if(MainMenu.PLAYERS == 3) {
+            TextView player3 = (TextView)findViewById(R.id.player3_name);
+            player3.setText(preferences.getString("Player 3", "Player 3"));
+        }
+        else {
+
+            if(MainMenu.PLAYERS == 4) {
+                TextView player3 = (TextView)findViewById(R.id.player3_name);
+                player3.setText(preferences.getString("Player 3", "Player 3"));
+                TextView player4 = (TextView)findViewById(R.id.player4_name);
+                player4.setText(preferences.getString("Player 4", "Player 4"));
+            }
+        }
+
 
     }
 

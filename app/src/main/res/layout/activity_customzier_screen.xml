@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,30 +13,131 @@
         android:layout_centerVertical="true"
         android:layout_margin="15sp">
 
-        <EditText
-            android:id="@+id/player_1"
+        <TableRow
+            android:id="@+id/row_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true">
+            <EditText
+                android:id="@+id/player_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="8"
+                android:text=""
+                android:hint="Player 1"
+                android:maxLength="10"/>
+            <ImageButton
+                android:id="@+id/move_up_1"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:scaleType="fitCenter"
+                android:background="@color/light"
+                android:alpha=".3"/>
+            <ImageButton
+                android:id="@+id/move_down_1"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:src="@drawable/arrow_down"
+                android:scaleType="fitCenter"
+                android:background="@color/light"
+                android:onClick="moveRow"/>
+        </TableRow>
 
-        <EditText
-            android:id="@+id/player_2"
+        <TableRow
+            android:id="@+id/row_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/player_1"/>
-
-        <EditText
-            android:id="@+id/player_3"
+            android:layout_below="@id/row_1">
+            <EditText
+                android:id="@+id/player_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="8"
+                android:text=""
+                android:hint="Player 2"
+                android:maxLength="10"/>
+            <ImageButton
+                android:id="@+id/move_up_2"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:src="@drawable/arrow_up"
+                android:scaleType="fitCenter"
+                android:background="@color/light"
+                android:onClick="moveRow"/>
+            <ImageButton
+                android:id="@+id/move_down_2"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:src="@drawable/arrow_down"
+                android:scaleType="fitCenter"
+                android:background="@color/light"
+                android:onClick="moveRow"/>
+        </TableRow>
+        <TableRow
+            android:id="@+id/row_3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/player_2"/>
-
-        <EditText
-            android:id="@+id/player_4"
+            android:layout_below="@id/row_2">
+            <EditText
+                android:id="@+id/player_3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="8"
+                android:text=""
+                android:hint="Player 3"
+                android:maxLength="10"/>
+            <ImageButton
+                android:id="@+id/move_up_3"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:src="@drawable/arrow_up"
+                android:scaleType="fitCenter"
+                android:background="@color/light"
+                android:onClick="moveRow"/>
+            <ImageButton
+                android:id="@+id/move_down_3"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:src="@drawable/arrow_down"
+                android:scaleType="fitCenter"
+                android:background="@color/light"
+                android:onClick="moveRow"/>
+        </TableRow>
+        <TableRow
+            android:id="@+id/row_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/player_3"/>
-
+            android:layout_below="@id/row_3">
+            <EditText
+                android:id="@+id/player_4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="8"
+                android:text=""
+                android:hint="Player 4"
+                android:maxLength="10"/>
+            <ImageButton
+                android:id="@+id/move_up_4"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:src="@drawable/arrow_up"
+                android:scaleType="fitCenter"
+                android:background="@color/light"
+                android:onClick="moveRow"/>
+            <ImageButton
+                android:id="@+id/move_down_4"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:background="@color/light"/>
+        </TableRow>
 
 
     </RelativeLayout>
