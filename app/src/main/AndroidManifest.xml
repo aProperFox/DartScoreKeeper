@@ -24,8 +24,15 @@
         <activity
             android:name=".GameScreen"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:noHistory="true"
+            android:noHistory="false"
             android:configChanges="orientation|keyboardHidden|screenSize">
+
+        </activity>
+
+        <activity
+            android:name=".LoadScreen"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:noHistory="true">
 
         </activity>
 

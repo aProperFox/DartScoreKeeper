@@ -19,15 +19,15 @@
         android:layout_alignParentTop="true"
         android:layout_margin="10sp"/>
 
-
     <Spinner
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60sp"
         android:id="@+id/player_selector"
         android:layout_gravity="center_horizontal"
         android:layout_below="@+id/title_text"
         android:layout_centerVertical="true"
-        android:layout_margin="10sp"/>
+        android:layout_margin="10sp"
+        android:alpha="0.75"/>
 
     <TextView
         android:id="@+id/instructional_text"
@@ -50,5 +50,6 @@
         android:layout_below="@+id/player_selector"
         android:layout_above="@id/instructional_text"
         android:layout_margin="10sp"/>
+
 
 </RelativeLayout>

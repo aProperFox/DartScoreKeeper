@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 
 
 public class GameScreen extends Activity {
@@ -27,6 +30,13 @@ public class GameScreen extends Activity {
     protected List<HashMap<String, String>> teamScores;
 
     protected List<HashMap<String, String>> tempState;
+
+    protected TextToSpeech ttobj;
+    protected final String[] taunts = {"Is that really the best you can dew", "Wowwwwwwwwwwww... Great throw",
+            "Smooth move, ex-lax", "I've seen better throws at a quadriplegic baseball game", "Pathetic",
+            "How disappointing", "Michael J Fox called, he wants his aim back", "Lame", "Not even close",
+            "Close, but no cigar"};
+    protected boolean hitSomething;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +97,17 @@ public class GameScreen extends Activity {
             tempState.get(2).put("score", "0");
         }
 
-        //Collections.copy(tempState, teamScores);
+        ttobj=new TextToSpeech(getApplicationContext(),
+                new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int status) {
+                        if(status != TextToSpeech.ERROR){
+                            ttobj.setLanguage(Locale.UK);
+                        }
+                    }
+                });
+
+        hitSomething = false;
 
     }
 
@@ -122,6 +142,8 @@ public class GameScreen extends Activity {
             toast.show();
             return;
         }
+
+        hitSomething = true;
 
         String scoreName = getResources().getResourceName(textView.getId());
         scoreName = scoreName.substring(scoreName.lastIndexOf('_') + 1);
@@ -204,11 +226,12 @@ public class GameScreen extends Activity {
 
         }
 
-        checkForWin();
-
     }
 
     public void endTurn(View view) {
+
+        checkForWin();
+
         if(isGameOver) {
             return;
         }
@@ -240,8 +263,13 @@ public class GameScreen extends Activity {
             activeTeam.setBackground(getResources().getDrawable(R.color.active));
         }
 
+        if(!hitSomething) {
+            Random rand = new Random();
+            ttobj.speak(taunts[rand.nextInt(taunts.length)], TextToSpeech.QUEUE_FLUSH, null);
+        }
 
         buttonsPressed = 0;
+        hitSomething = false;
 
         tempState = new ArrayList<HashMap<String, String>>();
         for(HashMap<String, String> hm: teamScores) {
@@ -270,6 +298,18 @@ public class GameScreen extends Activity {
         CharSequence text;
         int duration = Toast.LENGTH_LONG;
 
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000); // As I am using LENGTH_LONG in Toast
+                    GameScreen.this.finish();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
         switch (MainMenu.PLAYERS) {
             case 2:
                 otherTeam = (turn == 1)? 2 : 1;
@@ -281,8 +321,9 @@ public class GameScreen extends Activity {
 
                     Toast toast2 = Toast.makeText(context, text, duration);
                     toast2.show();
+                    ttobj.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
                     isGameOver = true;
-                    finish();
+                    thread.start();
                 }
                 break;
 
@@ -298,8 +339,9 @@ public class GameScreen extends Activity {
 
                 Toast toast3 = Toast.makeText(context, text, duration);
                 toast3.show();
+                ttobj.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
                 isGameOver = true;
-                finish();
+                thread.start();
 
                 break;
             case 4:
@@ -312,8 +354,9 @@ public class GameScreen extends Activity {
 
                     Toast toast4 = Toast.makeText(context, text, duration);
                     toast4.show();
+                    ttobj.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
                     isGameOver = true;
-                    finish();
+                    thread.start();
                 }
 
                 break;
@@ -451,6 +494,15 @@ public class GameScreen extends Activity {
         }
 
 
+    }
+
+    @Override
+    public void onPause(){
+        if(ttobj !=null){
+            ttobj.stop();
+            ttobj.shutdown();
+        }
+        super.onPause();
     }
 
 }
