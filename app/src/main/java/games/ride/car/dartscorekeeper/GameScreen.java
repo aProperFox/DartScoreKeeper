@@ -345,7 +345,7 @@ public class GameScreen extends Activity {
 
                 break;
             case 4:
-                otherTeam = ((turn-1)>>1) + 1;
+                otherTeam = (turn == 1)? 2 : 1;
                 System.out.println("Other team = " + otherTeam);
 
                 if(score >= Integer.parseInt(teamScores.get(otherTeam - 1).get("score"))) {
