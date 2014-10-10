@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/game_over_layout"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_dialog">
+
+    <View
+        android:id="@+id/center_view"
+        android:layout_width="fill_parent"
+        android:layout_height="0sp"
+        android:layout_centerVertical="true"/>
+
+    <TextView
+        android:id="@+id/game_over_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/center_view"
+        android:text="Are you sure you wish to exit?"
+        android:textColor="#b3b3b3"
+        android:textSize="40sp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginTop="5sp"
+        android:layout_marginBottom="5sp"/>
+
+    <LinearLayout
+        android:id="@+id/continue_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/center_view"
+        android:layout_marginTop="5sp"
+        android:layout_marginBottom="5sp">
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Yes"
+            android:layout_margin="5sp"
+            android:padding="5sp"
+            android:layout_weight="1"
+            android:onClick="onConfirm"
+            android:background="@drawable/rounded_button"
+            android:gravity="center"
+            android:textSize="25sp"
+            android:textColor="#b3b3b3"/>
+        <Button
+            android:id="@+id/decline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="No"
+            android:padding="5sp"
+            android:layout_margin="5sp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_button"
+            android:gravity="center"
+            android:onClick="onDecline"
+            android:textSize="25sp"
+            android:textColor="#b3b3b3"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

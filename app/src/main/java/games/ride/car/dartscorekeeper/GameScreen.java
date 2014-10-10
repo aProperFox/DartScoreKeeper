@@ -1,17 +1,25 @@
 package games.ride.car.dartscorekeeper;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
+import android.view.Display;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +45,14 @@ public class GameScreen extends Activity {
             "How disappointing", "Michael J Fox called, he wants his aim back", "Lame", "Not even close",
             "Close, but no cigar"};
     protected boolean hitSomething;
+
+    private Vibrator myVib;
+
+    protected String closed = "(X)";
+
+    protected Dialog endDialog;
+    protected View endView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +125,10 @@ public class GameScreen extends Activity {
 
         hitSomething = false;
 
+        myVib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+
+        initializeDialog();
+
     }
 
     public void onTeamScore(View view) {
@@ -159,25 +179,37 @@ public class GameScreen extends Activity {
 
         String scoreHit = teamScores.get(turn-1).get(scoreName);
 
-        int timesHit = (scoreHit != null && !scoreHit.isEmpty())? StringUtils.countMatches(teamScores.get(turn - 1).get(scoreName), "X"): 0;
+        int timesHit = 0;
+        if(scoreHit != null && !scoreHit.isEmpty()) {
+            if(scoreHit.equals("/")) {
+                timesHit = 1;
+            } else if(scoreHit.equals("X")) {
 
-        String hitString = "";
+                timesHit = 2;
+            } else if(scoreHit.equals(closed)) {
+                timesHit = 3;
+            } else {
+                    Log.e("ERROR", "Option " + scoreHit + " is not a valid score!");
+            }
+        }
 
         int newScore = 0;
 
-        if(timesHit < 3) {
-            timesHit ++;
-            for(int i = 0; i < timesHit; i++) {
-                hitString += "X";
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    hitString += "\n";
-                }
-            }
-            teamScores.get(turn - 1).put(scoreName, hitString);
-            textView.setText(hitString);
-            if(timesHit == 3) {
-                //textView.setTextColor(Color.rgb(176,53,53));
-            }
+        if(timesHit == 0) {
+
+            teamScores.get(turn - 1).put(scoreName, "/");
+            textView.setText("/");
+
+        } else if(timesHit == 1) {
+
+            teamScores.get(turn - 1).put(scoreName, "X");
+            textView.setText("X");
+
+        } else if(timesHit == 2) {
+
+            teamScores.get(turn - 1).put(scoreName, closed);
+            textView.setText(closed);
+
         } else {
 
             if(MainMenu.PLAYERS == 3) {
@@ -189,7 +221,7 @@ public class GameScreen extends Activity {
 
                         String scoreClosed = teamScores.get(i-1).get(scoreName);
 
-                        if(scoreClosed == null || StringUtils.countMatches(scoreClosed, "X") < 3) {
+                        if(scoreClosed == null || scoreClosed != closed) {
 
                             score = (TextView) findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
 
@@ -208,7 +240,7 @@ public class GameScreen extends Activity {
                 int otherTeam = (turn == 1)? 2: 1;
                 String scoreClosed = teamScores.get(otherTeam-1).get(scoreName);
 
-                if(scoreClosed == null || StringUtils.countMatches(scoreClosed, "X") < 3) {
+                if(scoreClosed == null || scoreClosed != closed) {
 
                     String teamScoreId = team + "_score";
 
@@ -229,6 +261,8 @@ public class GameScreen extends Activity {
     }
 
     public void endTurn(View view) {
+
+        myVib.vibrate(50);
 
         checkForWin();
 
@@ -285,7 +319,7 @@ public class GameScreen extends Activity {
         HashMap<String, String> playerMap = teamScores.get(turn-1);
 
         for(int i = 0; i < scoreNames.length; i++) {
-            if (playerMap.get(scoreNames[i]) == null || StringUtils.countMatches(playerMap.get(scoreNames[i]), "X") < 3 ) {
+            if (playerMap.get(scoreNames[i]) == null || playerMap.get(scoreNames[i]) != closed) {
                 return;
             }
         }
@@ -363,10 +397,66 @@ public class GameScreen extends Activity {
         }
     }
 
+    private void initializeDialog() {
+        // Set display variables
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int screenWidth = size.x;
+        int screenHeight = size.y;
+
+        // Layout inflater to help inflate a view for the dialog when the game is over
+        LayoutInflater inflater = LayoutInflater.from(GameScreen.this);
+        endView = inflater.inflate(R.layout.dialog_exit, null);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            endView.setMinimumHeight((int) (screenHeight * 0.9f));
+            endView.setMinimumWidth((int) (screenWidth * 0.6f));
+        } else {
+            endView.setMinimumWidth((int) (screenWidth * 0.9f));
+            endView.setMinimumHeight((int) (screenHeight * 0.6f));
+        }
+
+
+        // Instantiate the end dialog for when the game is over
+        endDialog = new Dialog( GameScreen.this, android.R.style.Theme_Translucent );
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            endDialog.getWindow().setLayout( screenWidth /2, (int) (screenHeight * 0.9f));
+        } else {
+            endDialog.getWindow().setLayout((int) (screenWidth * 0.9f), screenHeight / 2);
+        }
+        endDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        endDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        endDialog.setContentView(endView);
+        endDialog.getWindow().getAttributes().dimAmount = 0.5f;
+
+        endDialog.setOnKeyListener(new Dialog.OnKeyListener() {
+
+            @Override
+            public boolean onKey(DialogInterface arg0, int keyCode,
+                                 KeyEvent event) {
+                // TODO Auto-generated method stub
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+                }
+                return true;
+            }
+        });
+    }
+
     @Override
     public void onBackPressed(){
+        endDialog.show();
+    }
 
+    public void onConfirm(View view) {
+        myVib.vibrate(50);
+        endDialog.cancel();
         finish();
+    }
+
+    public void onDecline(View view) {
+        myVib.vibrate(50);
+        endDialog.cancel();
     }
 
     public void undoMoves(View view) {
@@ -448,10 +538,6 @@ public class GameScreen extends Activity {
                 tempText = teamScores.get(j - 1).get(scoreNames[i]);
                 if (tempText == null)
                     tempText = "";
-                tempText = tempText.replace("\n", "");
-                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    tempText = tempText.replaceAll("X", "X\n");
-                }
                 textView.setText(tempText);
             }
         }

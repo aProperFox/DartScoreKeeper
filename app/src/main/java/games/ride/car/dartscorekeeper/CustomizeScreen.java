@@ -5,17 +5,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Tyler on 10/1/2014.
  */
 public class CustomizeScreen extends Activity {
 
-    private EditText player1, player2, player3, player4;
+    private AutoCompleteTextView player1, player2, player3, player4;
 
 
     @Override
@@ -26,10 +33,10 @@ public class CustomizeScreen extends Activity {
         SharedPreferences preferences = getApplicationContext().getSharedPreferences(MainMenu.PREFERENCES, 0);
 
 
-        player1 = (EditText) findViewById(R.id.player_1);
-        player2 = (EditText) findViewById(R.id.player_2);
-        player3 = (EditText) findViewById(R.id.player_3);
-        player4 = (EditText) findViewById(R.id.player_4);
+        player1 = (AutoCompleteTextView) findViewById(R.id.player_1);
+        player2 = (AutoCompleteTextView) findViewById(R.id.player_2);
+        player3 = (AutoCompleteTextView) findViewById(R.id.player_3);
+        player4 = (AutoCompleteTextView) findViewById(R.id.player_4);
 
         player1.setText(preferences.getString("Player 1", ""));
         player2.setText(preferences.getString("Player 2", ""));
@@ -86,6 +93,27 @@ public class CustomizeScreen extends Activity {
 
         }
 
+        Set<String> names = new HashSet<String>();
+        names = preferences.getStringSet("names", names);
+
+        ArrayList<String> players = new ArrayList<String>();
+        players.addAll(names);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, players);
+        AutoCompleteTextView textView = (AutoCompleteTextView)
+                findViewById(R.id.player_1);
+        textView.setAdapter(adapter);
+        textView = (AutoCompleteTextView)
+                findViewById(R.id.player_2);
+        textView.setAdapter(adapter);
+        textView = (AutoCompleteTextView)
+                findViewById(R.id.player_3);
+        textView.setAdapter(adapter);
+        textView = (AutoCompleteTextView)
+                findViewById(R.id.player_4);
+        textView.setAdapter(adapter);
+
     }
 
     public void onPlayGame(View view) {
@@ -121,7 +149,20 @@ public class CustomizeScreen extends Activity {
             preferences.edit().putString("Player 4", player4.getText().toString()).commit();
         }
 
+        Set<String> names = new HashSet<String>();
+        names = preferences.getStringSet("names", names);
 
+        Log.d("CUSTOMIZE", "Names are: " + names);
+
+        String players[] = {player1.getText().toString(), player2.getText().toString(), player3.getText().toString(), player4.getText().toString()};
+
+        for(int i = 0; i < MainMenu.PLAYERS; i++) {
+            if(!names.contains(players[i])) {
+                names.add(players[i]);
+            }
+        }
+
+        preferences.edit().putStringSet("names", names).commit();
 
         Intent i = new Intent(CustomizeScreen.this, GameScreen.class);
         startActivity(i);

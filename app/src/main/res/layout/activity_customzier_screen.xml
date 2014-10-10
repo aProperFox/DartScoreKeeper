@@ -18,12 +18,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true">
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/player_1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="8"
                 android:text=""
+                android:popupBackground="#b3b3b3"
+                android:dropDownHeight="wrap_content"
+                android:completionThreshold="1"
                 android:hint="Player 1"
                 android:maxLength="10"/>
             <ImageButton
@@ -50,12 +53,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/row_1">
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/player_2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="8"
                 android:text=""
+                android:dropDownHeight="wrap_content"
+                android:popupBackground="#b3b3b3"
+                android:completionThreshold="1"
                 android:hint="Player 2"
                 android:maxLength="10"/>
             <ImageButton
@@ -82,12 +88,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/row_2">
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/player_3"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="8"
                 android:text=""
+                android:dropDownHeight="wrap_content"
+                android:popupBackground="#b3b3b3"
+                android:completionThreshold="1"
                 android:hint="Player 3"
                 android:maxLength="10"/>
             <ImageButton
@@ -114,13 +123,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/row_3">
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/player_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="8"
                 android:text=""
+                android:dropDownHeight="wrap_content"
+                android:completionThreshold="1"
                 android:hint="Player 4"
+                android:popupBackground="#b3b3b3"
                 android:maxLength="10"/>
             <ImageButton
                 android:id="@+id/move_up_4"
