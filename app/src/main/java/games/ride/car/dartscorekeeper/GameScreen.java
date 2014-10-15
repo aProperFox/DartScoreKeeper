@@ -41,9 +41,8 @@ public class GameScreen extends Activity {
 
     protected TextToSpeech ttobj;
     protected final String[] taunts = {"Is that really the best you can dew", "Wowwwwwwwwwwww... Great throw",
-            "Smooth move, ex-lax", "I've seen better throws at a quadriplegic baseball game", "Pathetic",
-            "How disappointing", "Michael J Fox called, he wants his aim back", "Lame", "Not even close",
-            "Close, but no cigar"};
+            "Smooth move, ex-lax", "Pathetic", "How disappointing", "Lame", "Not even close",
+            "Close, but no cigar", "Well that was terrible", "Boring"};
     protected boolean hitSomething;
 
     private Vibrator myVib;
@@ -51,6 +50,7 @@ public class GameScreen extends Activity {
     protected String closed = "(X)";
 
     protected Dialog endDialog;
+    protected View exitView;
     protected View endView;
 
 
@@ -58,6 +58,12 @@ public class GameScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        initializeGame();
+
+
+    }
+
+    public void initializeGame() {
 
         if(MainMenu.PLAYERS == 3) {
             if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -75,16 +81,14 @@ public class GameScreen extends Activity {
         }
 
         setPlayerNames();
-
-
         turn = 1;
 
         if(MainMenu.PLAYERS == 3) {
             TextView activeTeam = (TextView) findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
-            activeTeam.setBackground(getResources().getDrawable(R.color.active));
+            activeTeam.setBackgroundDrawable(getResources().getDrawable(R.color.active));
         } else {
             LinearLayout activeTeam = (LinearLayout) findViewById(getResources().getIdentifier("team_" + turn, "id", getPackageName()));
-            activeTeam.setBackground(getResources().getDrawable(R.color.active));
+            activeTeam.setBackgroundDrawable(getResources().getDrawable(R.color.active));
         }
 
         buttonsPressed = 0;
@@ -128,7 +132,6 @@ public class GameScreen extends Activity {
         myVib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
 
         initializeDialog();
-
     }
 
     public void onTeamScore(View view) {
@@ -274,7 +277,7 @@ public class GameScreen extends Activity {
         if(players == 3) {
 
             TextView activeTeam = (TextView) findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
-            activeTeam.setBackground(getResources().getDrawable(R.color.light));
+            activeTeam.setBackgroundDrawable(getResources().getDrawable(R.color.light));
             turn += 1;
 
 
@@ -282,11 +285,11 @@ public class GameScreen extends Activity {
                 turn = 1;
 
             activeTeam = (TextView) findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
-            activeTeam.setBackground(getResources().getDrawable(R.color.active));
+            activeTeam.setBackgroundDrawable(getResources().getDrawable(R.color.active));
         } else {
 
             LinearLayout activeTeam = (LinearLayout) findViewById(getResources().getIdentifier("team_" + turn, "id", getPackageName()));
-            activeTeam.setBackground(getResources().getDrawable(R.color.light));
+            activeTeam.setBackgroundDrawable(getResources().getDrawable(R.color.light));
             turn += 1;
 
 
@@ -294,12 +297,13 @@ public class GameScreen extends Activity {
                 turn = 1;
 
             activeTeam = (LinearLayout) findViewById(getResources().getIdentifier("team_" + turn, "id", getPackageName()));
-            activeTeam.setBackground(getResources().getDrawable(R.color.active));
+            activeTeam.setBackgroundDrawable(getResources().getDrawable(R.color.active));
         }
 
         if(!hitSomething) {
             Random rand = new Random();
-            ttobj.speak(taunts[rand.nextInt(taunts.length)], TextToSpeech.QUEUE_FLUSH, null);
+            if(getSharedPreferences(MainMenu.PREFERENCES, 0).getBoolean("allowTaunts", true))
+                ttobj.speak(taunts[rand.nextInt(taunts.length)], TextToSpeech.QUEUE_FLUSH, null);
         }
 
         buttonsPressed = 0;
@@ -325,39 +329,27 @@ public class GameScreen extends Activity {
         }
 
 
-        int otherTeam = 0;
+        int otherTeam;
 
-        Context context;
-        String playerName = "";
-        CharSequence text;
-        int duration = Toast.LENGTH_LONG;
+        String playerName;
+        String text;
 
-        Thread thread = new Thread(){
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000); // As I am using LENGTH_LONG in Toast
-                    GameScreen.this.finish();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+        TextView endText;
 
         switch (MainMenu.PLAYERS) {
             case 2:
                 otherTeam = (turn == 1)? 2 : 1;
 
                 if(score >= Integer.parseInt(teamScores.get(otherTeam - 1).get("score"))) {
-                    context = getApplicationContext();
                     playerName = getSharedPreferences(MainMenu.PREFERENCES, 0).getString("Player " + turn, "Player " + turn);
                     text = playerName + " Wins!";
 
-                    Toast toast2 = Toast.makeText(context, text, duration);
-                    toast2.show();
-                    ttobj.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    endText = (TextView) endView.findViewById(R.id.game_over_text);
+                    endText.setText(text);
+                    ttobj.speak(text, TextToSpeech.QUEUE_FLUSH, null);
                     isGameOver = true;
-                    thread.start();
+                    endDialog.setContentView(endView);
+                    endDialog.show();
                 }
                 break;
 
@@ -367,15 +359,15 @@ public class GameScreen extends Activity {
                     if(Integer.parseInt(teamScores.get(i-1).get("score")) < score)
                         return;
                 }
-                context = getApplicationContext();
                 playerName = getSharedPreferences(MainMenu.PREFERENCES, 0).getString("Player " + turn, "Player " + turn);
                 text = playerName + " Wins!";
 
-                Toast toast3 = Toast.makeText(context, text, duration);
-                toast3.show();
-                ttobj.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                endText = (TextView) endView.findViewById(R.id.game_over_text);
+                endText.setText(text);
+                ttobj.speak(text, TextToSpeech.QUEUE_FLUSH, null);
                 isGameOver = true;
-                thread.start();
+                endDialog.setContentView(endView);
+                endDialog.show();
 
                 break;
             case 4:
@@ -383,14 +375,26 @@ public class GameScreen extends Activity {
                 System.out.println("Other team = " + otherTeam);
 
                 if(score >= Integer.parseInt(teamScores.get(otherTeam - 1).get("score"))) {
-                    context = getApplicationContext();
-                    text = "Team " + turn + " Wins!";
+                    int p1, p2;
+                    if(turn == 1) {
+                        p1 = 1;
+                        p2 = 4;
+                    } else {
+                        p1 = 2;
+                        p2 = 3;
+                    }
+                        playerName = getSharedPreferences(MainMenu.PREFERENCES, 0).getString("Player " + p1, "Player " + p1);
+                        text = playerName + " and ";
+                        playerName = getSharedPreferences(MainMenu.PREFERENCES, 0).getString("Player " + p2, "Player " + p2);
+                        text += playerName + " win!";
 
-                    Toast toast4 = Toast.makeText(context, text, duration);
-                    toast4.show();
-                    ttobj.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
+
+                    endText = (TextView) endView.findViewById(R.id.game_over_text);
+                    endText.setText(text);
+                    ttobj.speak(text, TextToSpeech.QUEUE_FLUSH, null);
                     isGameOver = true;
-                    thread.start();
+                    endDialog.setContentView(endView);
+                    endDialog.show();
                 }
 
                 break;
@@ -407,7 +411,16 @@ public class GameScreen extends Activity {
 
         // Layout inflater to help inflate a view for the dialog when the game is over
         LayoutInflater inflater = LayoutInflater.from(GameScreen.this);
-        endView = inflater.inflate(R.layout.dialog_exit, null);
+        exitView = inflater.inflate(R.layout.dialog_exit, null);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            exitView.setMinimumHeight((int) (screenHeight * 0.9f));
+            exitView.setMinimumWidth((int) (screenWidth * 0.6f));
+        } else {
+            exitView.setMinimumWidth((int) (screenWidth * 0.9f));
+            exitView.setMinimumHeight((int) (screenHeight * 0.6f));
+        }
+
+        endView = inflater.inflate(R.layout.dialog_end_game, null);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             endView.setMinimumHeight((int) (screenHeight * 0.9f));
             endView.setMinimumWidth((int) (screenWidth * 0.6f));
@@ -426,8 +439,9 @@ public class GameScreen extends Activity {
         }
         endDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         endDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        endDialog.setContentView(endView);
+        endDialog.setContentView(exitView);
         endDialog.getWindow().getAttributes().dimAmount = 0.5f;
+        endDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimationCancel;
 
         endDialog.setOnKeyListener(new Dialog.OnKeyListener() {
 
@@ -449,14 +463,51 @@ public class GameScreen extends Activity {
     }
 
     public void onConfirm(View view) {
-        myVib.vibrate(50);
+        myVib.vibrate(100);
         endDialog.cancel();
-        finish();
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(600); // As I am using LENGTH_LONG in Toast
+                    GameScreen.this.finish();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        };
+        thread.run();
     }
 
     public void onDecline(View view) {
-        myVib.vibrate(50);
+        myVib.vibrate(100);
         endDialog.cancel();
+    }
+
+    public void onQuit(View view) {
+        myVib.vibrate(100);
+        endDialog.cancel();
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(600); // As I am using LENGTH_LONG in Toast
+                    GameScreen.this.finish();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        };
+        thread.run();
+    }
+
+    public void onRematch(View view) {
+        myVib.vibrate(100);
+        endDialog.cancel();
+
+        initializeGame();
     }
 
     public void undoMoves(View view) {
@@ -514,7 +565,7 @@ public class GameScreen extends Activity {
             }
 
             TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
-            activePlayer.setBackground(getResources().getDrawable(R.color.active));
+            activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
         } else {
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 setContentView(R.layout.activity_game_screen_2_columns_landscape);
@@ -523,7 +574,7 @@ public class GameScreen extends Activity {
                 setContentView(R.layout.activity_game_screen_2_columns_portrait);
             }
             LinearLayout activePlayer = (LinearLayout)findViewById(getResources().getIdentifier("team_" + turn, "id", getPackageName()));
-            activePlayer.setBackground(getResources().getDrawable(R.color.active));
+            activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
         }
 
         // Re-initialze view

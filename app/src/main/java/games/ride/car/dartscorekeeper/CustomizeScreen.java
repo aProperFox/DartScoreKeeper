@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -30,7 +32,7 @@ public class CustomizeScreen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customzier_screen);
 
-        SharedPreferences preferences = getApplicationContext().getSharedPreferences(MainMenu.PREFERENCES, 0);
+        final SharedPreferences preferences = getApplicationContext().getSharedPreferences(MainMenu.PREFERENCES, 0);
 
 
         player1 = (AutoCompleteTextView) findViewById(R.id.player_1);
@@ -113,6 +115,22 @@ public class CustomizeScreen extends Activity {
         textView = (AutoCompleteTextView)
                 findViewById(R.id.player_4);
         textView.setAdapter(adapter);
+
+        CheckBox checkBox = (CheckBox) findViewById(R.id.checkbox);
+
+        checkBox.setChecked(preferences.getBoolean("allowTaunts", true));
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+                if(isChecked) {
+                    preferences.edit().putBoolean("allowTaunts", true).apply();
+                } else {
+                    preferences.edit().putBoolean("allowTaunts", false).apply();
+                }
+            }
+        });
 
     }
 

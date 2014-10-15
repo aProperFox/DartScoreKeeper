@@ -13,11 +13,11 @@
         android:layout_centerVertical="true"/>
 
     <TextView
-        android:id="@+id/exit_text"
+        android:id="@+id/game_over_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/center_view"
-        android:text="Are you sure you wish to exit?"
+        android:text="Play again?"
         android:textColor="#b3b3b3"
         android:textSize="40sp"
         android:layout_centerHorizontal="true"
@@ -34,29 +34,29 @@
         android:layout_marginBottom="5sp">
 
         <Button
-            android:id="@+id/confirm"
+            android:id="@+id/rematch"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Yes"
+            android:text="Rematch"
             android:layout_margin="5sp"
             android:padding="5sp"
             android:layout_weight="1"
-            android:onClick="onConfirm"
+            android:onClick="onRematch"
             android:background="@drawable/rounded_button"
             android:gravity="center"
             android:textSize="25sp"
             android:textColor="#b3b3b3"/>
         <Button
-            android:id="@+id/decline"
+            android:id="@+id/quit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="No"
+            android:text="Quit"
             android:padding="5sp"
             android:layout_margin="5sp"
             android:layout_weight="1"
             android:background="@drawable/rounded_button"
             android:gravity="center"
-            android:onClick="onDecline"
+            android:onClick="onQuit"
             android:textSize="25sp"
             android:textColor="#b3b3b3"/>
 
