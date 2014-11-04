@@ -55,6 +55,8 @@ public class GameScreen extends Activity {
     protected View exitView;
     protected View endView;
 
+    protected int disabledPlayer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +90,8 @@ public class GameScreen extends Activity {
                 extraName.setVisibility(View.GONE);
             }
         }
+
+        disabledPlayer = 0;
 
         setPlayerNames();
         turn = 1;
@@ -302,6 +306,12 @@ public class GameScreen extends Activity {
             if(turn > MainMenu.PLAYERS) {
                 turn = 1;
             }
+            if(turn == disabledPlayer) {
+                turn++;
+                if(turn > MainMenu.PLAYERS) {
+                    turn = 1;
+                }
+            }
         }
 
         TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
@@ -401,10 +411,18 @@ public class GameScreen extends Activity {
                     System.out.println("Score of " + i + " = " + teamScores.get(i-1).get("score") + ", Current score: " + score);
                     if(Integer.parseInt(teamScores.get(i-1).get("score")) < score) {
                         // TODO: Add check for knockout player
-
-                        return;
+                        hasWon = false;
+                    } else if(Integer.parseInt(teamScores.get(i-1).get("score")) > score && disabledPlayer == 0) {
+                        disabledPlayer = i;
+                        TextView disabled = new TextView(this);
+                        for(int j = 0; j < scoreNames.length; j++) {
+                            disabled = (TextView)findViewById(getResources().getIdentifier("team_" + i + "_" + scoreNames[j], "id", getPackageName()));
+                            disabled.setAlpha(0.25f);
+                        }
                     }
                 }
+                if(!hasWon)
+                    return;
                 playerName = getSharedPreferences(MainMenu.PREFERENCES, 0).getString("Player " + turn, "Player " + turn);
                 text = playerName + " Wins!";
 
@@ -645,6 +663,14 @@ public class GameScreen extends Activity {
 
         TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
+
+        if(disabledPlayer != 0) {
+            TextView disabled = new TextView(this);
+            for(int j = 0; j < scoreNames.length; j++) {
+                disabled = (TextView)findViewById(getResources().getIdentifier("team_" + disabledPlayer + "_" + scoreNames[j], "id", getPackageName()));
+                disabled.setAlpha(0.25f);
+            }
+        }
 
         // Re-initialze view
         TextView textView = new TextView(this);
