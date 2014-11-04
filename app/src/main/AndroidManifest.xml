@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="games.ride.car.dartscorekeeper" >
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -20,13 +21,14 @@
         <activity
             android:name=".CustomizeScreen"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:noHistory="true" >
+            android:noHistory="true">
         </activity>
         <activity
             android:name=".GameScreen"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:noHistory="false"
-            android:configChanges="orientation|keyboardHidden|screenSize">
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:keepScreenOn="true">
 
         </activity>
 

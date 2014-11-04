@@ -3,37 +3,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark">
+    android:background="@color/dark"
+    android:keepScreenOn="true">
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0sp"
         android:layout_weight="10"
-        android:background="@color/light">
+        android:background="@color/light"
+        android:orientation="horizontal">
         <LinearLayout
             android:id="@+id/team_1"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_width="0sp"
             android:layout_weight="10"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/player1_name"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="0sp"
                 android:layout_weight="1"
                 android:text="Player 1"
                 android:layout_gravity="center"
+                android:gravity="center"
                 android:textColor="@color/dark"
                 android:textSize="20sp"/>
 
             <TextView
                 android:id="@+id/player4_name"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="0sp"
                 android:layout_weight="1"
                 android:text=""
                 android:layout_gravity="center"
+                android:gravity="center"
                 android:textSize="20sp"
                 android:textColor="@color/dark"/>
 
@@ -51,34 +55,36 @@
 
         <LinearLayout
             android:id="@+id/team_2"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_width="0sp"
             android:layout_weight="10"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/player2_name"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="0sp"
                 android:layout_weight="1"
                 android:text="Player 2"
                 android:layout_gravity="center"
+                android:gravity="center"
                 android:textSize="20sp"
                 android:textColor="@color/dark"/>
 
             <TextView
                 android:id="@+id/player3_name"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="0sp"
                 android:layout_weight="1"
                 android:text=""
                 android:layout_gravity="center"
+                android:gravity="center"
                 android:textSize="20sp"
                 android:textColor="@color/dark"/>
 
         </LinearLayout>
 
-    </TableRow>
+    </LinearLayout>
 
     <View
         android:layout_width="fill_parent"
@@ -107,10 +113,10 @@
                 android:layout_weight="1"
                 android:text=""
                 android:textSize="30sp"
-                android:textColor="@color/dark"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:background="@color/light"
+                android:textColor="@color/light"
+                android:background="@color/dark"
                 android:onClick="onTeamScore"/>
             <Button
                 android:id="@+id/team_1_19"
@@ -131,10 +137,10 @@
                 android:layout_weight="1"
                 android:text=""
                 android:textSize="30sp"
-                android:textColor="@color/dark"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:background="@color/light"
+                android:textColor="@color/light"
+                android:background="@color/dark"
                 android:onClick="onTeamScore"/>
             <Button
                 android:id="@+id/team_1_17"
@@ -155,10 +161,10 @@
                 android:layout_weight="1"
                 android:text=""
                 android:textSize="30sp"
-                android:textColor="@color/dark"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:background="@color/light"
+                android:textColor="@color/light"
+                android:background="@color/dark"
                 android:onClick="onTeamScore"/>
             <Button
                 android:id="@+id/team_1_15"
@@ -179,11 +185,11 @@
                 android:layout_weight="1"
                 android:text=""
                 android:textSize="30sp"
-                android:textColor="@color/dark"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:onClick="onTeamScore"
-                android:background="@color/light"/>
+                android:textColor="@color/light"
+                android:background="@color/dark"/>
 
             <TextView
                 android:id="@+id/team_1_score"
@@ -217,7 +223,8 @@
                 android:layout_weight="1"
                 android:text="20"
                 android:textSize="30sp"
-                android:textColor="@color/dark"
+                android:textColor="@color/light"
+                android:background="@color/green"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -227,6 +234,7 @@
                 android:text="19"
                 android:textSize="30sp"
                 android:textColor="@color/dark"
+                android:background="@color/closed"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -235,7 +243,8 @@
                 android:layout_weight="1"
                 android:text="18"
                 android:textSize="30sp"
-                android:textColor="@color/dark"
+                android:textColor="@color/light"
+                android:background="@color/green"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -245,6 +254,7 @@
                 android:text="17"
                 android:textSize="30sp"
                 android:textColor="@color/dark"
+                android:background="@color/closed"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -253,7 +263,8 @@
                 android:layout_weight="1"
                 android:text="16"
                 android:textSize="30sp"
-                android:textColor="@color/dark"
+                android:textColor="@color/light"
+                android:background="@color/green"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -263,6 +274,7 @@
                 android:text="15"
                 android:textSize="30sp"
                 android:textColor="@color/dark"
+                android:background="@color/closed"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -271,7 +283,8 @@
                 android:layout_weight="1"
                 android:text="BULL"
                 android:textSize="15sp"
-                android:textColor="@color/dark"
+                android:textColor="@color/light"
+                android:background="@color/green"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -305,10 +318,10 @@
                 android:layout_weight="1"
                 android:text=""
                 android:textSize="30sp"
-                android:textColor="@color/dark"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:background="@color/light"
+                android:textColor="@color/light"
+                android:background="@color/dark"
                 android:onClick="onTeamScore"/>
             <Button
                 android:id="@+id/team_2_19"
@@ -329,10 +342,10 @@
                 android:layout_weight="1"
                 android:text=""
                 android:textSize="30sp"
-                android:textColor="@color/dark"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:background="@color/light"
+                android:textColor="@color/light"
+                android:background="@color/dark"
                 android:onClick="onTeamScore"/>
             <Button
                 android:id="@+id/team_2_17"
@@ -353,10 +366,10 @@
                 android:layout_weight="1"
                 android:text=""
                 android:textSize="30sp"
-                android:textColor="@color/dark"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:background="@color/light"
+                android:textColor="@color/light"
+                android:background="@color/dark"
                 android:onClick="onTeamScore"/>
             <Button
                 android:id="@+id/team_2_15"
@@ -377,10 +390,10 @@
                 android:layout_weight="1"
                 android:text=""
                 android:textSize="30sp"
-                android:textColor="@color/dark"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:background="@color/light"
+                android:textColor="@color/light"
+                android:background="@color/dark"
                 android:onClick="onTeamScore"/>
 
             <TextView

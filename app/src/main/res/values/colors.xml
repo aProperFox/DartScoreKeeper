@@ -2,5 +2,7 @@
 <resources>
     <color name="dark">#3e3e3e</color>
     <color name="light">#BEBEBE</color>
-    <color name="active">#CEE0B1</color>
+    <color name="active">#ffffffff</color>
+    <color name="closed">#ffe54046</color>
+    <color name="green">#ff33682c</color>
 </resources>
