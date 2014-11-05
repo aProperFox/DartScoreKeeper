@@ -39,12 +39,12 @@ public class GameScreen extends Activity {
     protected List<HashMap<String, String>> tempState;
 
     protected TextToSpeech ttobj;
-    protected final String[] taunts = {"Is that really the best you can dew", "Wowwwwwwwwwwww... Great throw",
+    protected final String[] taunts = {"Is that really the best you can dew", "Wow... Great throw",
             "Smooth move, ecks lacks", "Pathetic", "How disappointing", "Lame", "Not even close",
             "Close, but no cigar", "That was terrible", "Well this is boring", "I'm certainly not impressed",
-            "Don't expect to go pro any time soon", "I'm leaving", "Are you sure you know what target you're aiming for?",
-            "Maybe it's the darts... Maybe it's just you", "Is there a draft in here, Or are you just that bad?",
-            "That's okay... I didn't expect much from you"};
+            "Don't expect to go pro any time soon", "Not quite ready for the premiere league",
+            "Are you sure you know what target you're aiming for?", "Maybe it's the darts... Maybe it's just you",
+            "Is there a draft in here, Or are you just that bad?", "That's okay... I didn't expect much from you"};
     protected boolean hitSomething;
 
     private Vibrator myVib;
@@ -98,6 +98,7 @@ public class GameScreen extends Activity {
 
         TextView activePlayer = (TextView) findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
+        activePlayer.setTextColor(getResources().getColor(R.color.dark));
 
         buttonsPressed = 0;
 
@@ -238,7 +239,7 @@ public class GameScreen extends Activity {
                 TextView score = new TextView(this);
 
                 for(int i = 1; i < 4; i++) {
-                    if(i != turn) {
+                    if(i != turn && i != disabledPlayer) {
 
                         String scoreClosed = teamScores.get(i-1).get(scoreName);
 
@@ -316,11 +317,13 @@ public class GameScreen extends Activity {
 
         TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
+        activePlayer.setTextColor(getResources().getColor(R.color.dark));
 
         for(int i = 1; i <= MainMenu.PLAYERS; i++) {
             if(i != turn) {
                 activePlayer = (TextView) findViewById(getResources().getIdentifier("player" + i + "_name", "id", getPackageName()));
-                activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.light));
+                activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.dark));
+                activePlayer.setTextColor(getResources().getColor(R.color.light));
             }
         }
 
@@ -410,7 +413,6 @@ public class GameScreen extends Activity {
                 for(int i = 1; i < 4; i++) {
                     System.out.println("Score of " + i + " = " + teamScores.get(i-1).get("score") + ", Current score: " + score);
                     if(Integer.parseInt(teamScores.get(i-1).get("score")) < score) {
-                        // TODO: Add check for knockout player
                         hasWon = false;
                     } else if(Integer.parseInt(teamScores.get(i-1).get("score")) > score && disabledPlayer == 0) {
                         disabledPlayer = i;
@@ -663,6 +665,7 @@ public class GameScreen extends Activity {
 
         TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
+        activePlayer.setTextColor(getResources().getColor(R.color.dark));
 
         if(disabledPlayer != 0) {
             TextView disabled = new TextView(this);
