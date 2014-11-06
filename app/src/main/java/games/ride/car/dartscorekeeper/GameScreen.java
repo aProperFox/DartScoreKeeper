@@ -39,12 +39,12 @@ public class GameScreen extends Activity {
     protected List<HashMap<String, String>> tempState;
 
     protected TextToSpeech ttobj;
-    protected final String[] taunts = {"Is that really the best you can dew", "Wow... Great throw",
+    protected final String[] taunts = {"Is that really the best you can dew", "Wowwwwwwwwwwww... Great throw",
             "Smooth move, ecks lacks", "Pathetic", "How disappointing", "Lame", "Not even close",
             "Close, but no cigar", "That was terrible", "Well this is boring", "I'm certainly not impressed",
-            "Don't expect to go pro any time soon", "Not quite ready for the premiere league",
-            "Are you sure you know what target you're aiming for?", "Maybe it's the darts... Maybe it's just you",
-            "Is there a draft in here, Or are you just that bad?", "That's okay... I didn't expect much from you"};
+            "Don't expect to go pro any time soon", "I'm leaving", "Are you sure you know what target you're aiming for?",
+            "Maybe it's the darts... Maybe it's just you", "Is there a draft in here, Or are you just that bad?",
+            "That's okay... I didn't expect much from you"};
     protected boolean hitSomething;
 
     private Vibrator myVib;
@@ -56,7 +56,6 @@ public class GameScreen extends Activity {
     protected View endView;
 
     protected int disabledPlayer;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +97,6 @@ public class GameScreen extends Activity {
 
         TextView activePlayer = (TextView) findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
-        activePlayer.setTextColor(getResources().getColor(R.color.dark));
 
         buttonsPressed = 0;
 
@@ -194,7 +192,6 @@ public class GameScreen extends Activity {
 
         if(scoreName.equals("bull")) {
             hitPoints = 25;
-
         } else {
             hitPoints = Integer.parseInt(scoreName);
         }
@@ -317,13 +314,11 @@ public class GameScreen extends Activity {
 
         TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
-        activePlayer.setTextColor(getResources().getColor(R.color.dark));
 
         for(int i = 1; i <= MainMenu.PLAYERS; i++) {
             if(i != turn) {
                 activePlayer = (TextView) findViewById(getResources().getIdentifier("player" + i + "_name", "id", getPackageName()));
-                activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.dark));
-                activePlayer.setTextColor(getResources().getColor(R.color.light));
+                activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.light));
             }
         }
 
@@ -594,6 +589,14 @@ public class GameScreen extends Activity {
     }
 
     public void undoMoves(View view) {
+        int turn = this.turn;
+        if(MainMenu.PLAYERS == 4) {
+            if(turn == 3 || turn == 2) {
+                turn = 2;
+            } else {
+                turn = 1;
+            }
+        }
 
         TextView textView = new TextView(this);
         String tempText = "";
@@ -665,12 +668,11 @@ public class GameScreen extends Activity {
 
         TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
-        activePlayer.setTextColor(getResources().getColor(R.color.dark));
 
         if(disabledPlayer != 0) {
             TextView disabled = new TextView(this);
             for(int j = 0; j < scoreNames.length; j++) {
-                disabled = (TextView)findViewById(getResources().getIdentifier("team_" + disabledPlayer + "_" + scoreNames[j], "id", getPackageName()));
+                disabled = (TextView) findViewById(getResources().getIdentifier("team_" + disabledPlayer + "_" + scoreNames[j], "id", getPackageName()));
                 disabled.setAlpha(0.25f);
             }
         }

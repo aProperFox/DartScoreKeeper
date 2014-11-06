@@ -122,8 +122,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/light"
-                android:background="@color/green"/>
+                android:textColor="@color/dark"
+                android:background="@color/closed"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -132,8 +132,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/dark"
-                android:background="@color/closed"/>
+                android:textColor="@color/light"
+                android:background="@color/green"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -142,8 +142,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/light"
-                android:background="@color/green"/>
+                android:textColor="@color/dark"
+                android:background="@color/closed"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -152,8 +152,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/dark"
-                android:background="@color/closed"/>
+                android:textColor="@color/light"
+                android:background="@color/green"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -162,8 +162,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/light"
-                android:background="@color/green"/>
+                android:textColor="@color/dark"
+                android:background="@color/closed"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -172,8 +172,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/dark"
-                android:background="@color/closed"/>
+                android:textColor="@color/light"
+                android:background="@color/green"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -182,8 +182,8 @@
                 android:textSize="15sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/light"
-                android:background="@color/green"/>
+                android:textColor="@color/dark"
+                android:background="@color/closed"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -553,8 +553,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/light"
-                android:background="@color/green"/>
+                android:textColor="@color/dark"
+                android:background="@color/closed"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -563,8 +563,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/dark"
-                android:background="@color/closed"/>
+                android:textColor="@color/light"
+                android:background="@color/green"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -573,8 +573,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/light"
-                android:background="@color/green"/>
+                android:textColor="@color/dark"
+                android:background="@color/closed"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -583,8 +583,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/dark"
-                android:background="@color/closed"/>
+                android:textColor="@color/light"
+                android:background="@color/green"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -593,8 +593,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/light"
-                android:background="@color/green"/>
+                android:textColor="@color/dark"
+                android:background="@color/closed"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -603,8 +603,8 @@
                 android:textSize="30sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/dark"
-                android:background="@color/closed"/>
+                android:textColor="@color/light"
+                android:background="@color/green"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"
@@ -613,8 +613,8 @@
                 android:textSize="15sp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/light"
-                android:background="@color/green"/>
+                android:textColor="@color/dark"
+                android:background="@color/closed"/>
             <TextView
                 android:layout_width="0sp"
                 android:layout_height="fill_parent"

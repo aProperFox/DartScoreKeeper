@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -28,6 +29,7 @@ public class CustomizeScreen extends Activity {
 
     private AutoCompleteTextView player1, player2, player3, player4;
 
+    private CheckBox checkBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,7 @@ public class CustomizeScreen extends Activity {
                 findViewById(R.id.player_4);
         textView.setAdapter(adapter);
 
-        CheckBox checkBox = (CheckBox) findViewById(R.id.checkbox);
+        checkBox = (CheckBox) findViewById(R.id.checkbox);
 
         checkBox.setChecked(preferences.getBoolean("allowTaunts", true));
 
@@ -237,6 +239,11 @@ public class CustomizeScreen extends Activity {
         }
 
         preferences.edit().putStringSet("names", names).commit();
+
+        if(checkBox.isChecked()) {
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)-3, 0);
+        }
 
         Intent i = new Intent(CustomizeScreen.this, GameScreen.class);
         startActivity(i);

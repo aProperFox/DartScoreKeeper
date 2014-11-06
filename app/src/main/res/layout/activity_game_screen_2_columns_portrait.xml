@@ -228,8 +228,8 @@
                 android:layout_weight="1"
                 android:text="20"
                 android:textSize="30sp"
-                android:textColor="@color/light"
-                android:background="@color/green"
+                android:textColor="@color/dark"
+                android:background="@color/closed"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -238,8 +238,8 @@
                 android:layout_weight="1"
                 android:text="19"
                 android:textSize="30sp"
-                android:textColor="@color/dark"
-                android:background="@color/closed"
+                android:textColor="@color/light"
+                android:background="@color/green"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -248,8 +248,8 @@
                 android:layout_weight="1"
                 android:text="18"
                 android:textSize="30sp"
-                android:textColor="@color/light"
-                android:background="@color/green"
+                android:textColor="@color/dark"
+                android:background="@color/closed"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -258,8 +258,8 @@
                 android:layout_weight="1"
                 android:text="17"
                 android:textSize="30sp"
-                android:textColor="@color/dark"
-                android:background="@color/closed"
+                android:textColor="@color/light"
+                android:background="@color/green"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
@@ -268,16 +268,6 @@
                 android:layout_weight="1"
                 android:text="16"
                 android:textSize="30sp"
-                android:textColor="@color/light"
-                android:background="@color/green"
-                android:layout_gravity="center"
-                android:gravity="center"/>
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="0sp"
-                android:layout_weight="1"
-                android:text="15"
-                android:textSize="30sp"
                 android:textColor="@color/dark"
                 android:background="@color/closed"
                 android:layout_gravity="center"
@@ -286,10 +276,20 @@
                 android:layout_width="fill_parent"
                 android:layout_height="0sp"
                 android:layout_weight="1"
-                android:text="BULL"
-                android:textSize="15sp"
+                android:text="15"
+                android:textSize="30sp"
                 android:textColor="@color/light"
                 android:background="@color/green"
+                android:layout_gravity="center"
+                android:gravity="center"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="0sp"
+                android:layout_weight="1"
+                android:text="BULL"
+                android:textSize="15sp"
+                android:textColor="@color/dark"
+                android:background="@color/closed"
                 android:layout_gravity="center"
                 android:gravity="center"/>
             <TextView
