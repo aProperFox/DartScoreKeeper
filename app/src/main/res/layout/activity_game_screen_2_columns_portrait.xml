@@ -133,7 +133,7 @@
                 android:gravity="center"
                 android:textColor="@color/dark"
                 android:background="@color/light"
-                android:onClick="onDecline"/>
+                android:onClick="onTeamScore"/>
             <Button
                 android:id="@+id/team_1_18"
                 android:layout_width="fill_parent"
