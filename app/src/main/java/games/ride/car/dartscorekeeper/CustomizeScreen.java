@@ -242,7 +242,7 @@ public class CustomizeScreen extends Activity {
 
         if(checkBox.isChecked()) {
             AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            am.setStreamVolume(AudioManager.STREAM_MUSIC,am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)-3, 0);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)/2, 0);
         }
 
         Intent i = new Intent(CustomizeScreen.this, GameScreen.class);

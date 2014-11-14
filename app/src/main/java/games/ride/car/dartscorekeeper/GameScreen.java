@@ -39,12 +39,14 @@ public class GameScreen extends Activity {
     protected List<HashMap<String, String>> tempState;
 
     protected TextToSpeech ttobj;
-    protected final String[] taunts = {"Is that really the best you can dew", "Wowwwwwwwwwwww... Great throw",
+    protected final String[] taunts = {"Is that really the best you can dew", "Wow... Great throw",
             "Smooth move, ecks lacks", "Pathetic", "How disappointing", "Lame", "Not even close",
             "Close, but no cigar", "That was terrible", "Well this is boring", "I'm certainly not impressed",
             "Don't expect to go pro any time soon", "I'm leaving", "Are you sure you know what target you're aiming for?",
             "Maybe it's the darts... Maybe it's just you", "Is there a draft in here, Or are you just that bad?",
             "That's okay... I didn't expect much from you"};
+    protected int tauntsIterator;
+
     protected boolean hitSomething;
 
     private Vibrator myVib;
@@ -124,19 +126,14 @@ public class GameScreen extends Activity {
             tempState.get(2).put("score", "0");
         }
 
-        ttobj=new TextToSpeech(getApplicationContext(),
-                new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(int status) {
-                        if(status != TextToSpeech.ERROR){
-                            ttobj.setLanguage(Locale.UK);
-                        }
-                    }
-                });
+        connectToTTS();
 
         hitSomething = false;
 
         myVib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+
+        randomizeArray(taunts);
+        tauntsIterator = 0;
 
         initializeDialog();
     }
@@ -324,9 +321,12 @@ public class GameScreen extends Activity {
 
 
         if(!hitSomething) {
-            Random rand = new Random();
-            if(getSharedPreferences(MainMenu.PREFERENCES, 0).getBoolean("allowTaunts", true))
-                ttobj.speak(taunts[rand.nextInt(taunts.length)], TextToSpeech.QUEUE_FLUSH, null);
+            if(getSharedPreferences(MainMenu.PREFERENCES, 0).getBoolean("allowTaunts", true)) {
+                if(tauntsIterator >= taunts.length)
+                    tauntsIterator = 0;
+                ttobj.speak(taunts[tauntsIterator], TextToSpeech.QUEUE_FLUSH, null);
+            }
+            tauntsIterator++;
         }
 
         buttonsPressed = 0;
@@ -739,6 +739,30 @@ public class GameScreen extends Activity {
 
     }
 
+    public void randomizeArray(String[] array){
+        Random rgen = new Random();  // Random number generator
+
+        for (int i=0; i<array.length; i++) {
+            int randomPosition = rgen.nextInt(array.length);
+            String temp = array[i];
+            array[i] = array[randomPosition];
+            array[randomPosition] = temp;
+        }
+
+    }
+
+    private void connectToTTS() {
+        ttobj=new TextToSpeech(getApplicationContext(),
+            new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if(status == TextToSpeech.SUCCESS){
+                        ttobj.setLanguage(Locale.UK);
+                    }
+                }
+            });
+    }
+
     @Override
     public void onPause(){
         if(ttobj !=null){
@@ -746,6 +770,12 @@ public class GameScreen extends Activity {
             ttobj.shutdown();
         }
         super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        connectToTTS();
+        super.onResume();
     }
 
 }
