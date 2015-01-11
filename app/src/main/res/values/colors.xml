@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="dark">#3e3e3e</color>
+    <color name="gray">#515151</color>
+    <color name="mult1">#787878</color>
+    <color name="mult2">#9a9a9a</color>
     <color name="light">#BEBEBE</color>
     <color name="active">#ffffffff</color>
     <color name="closed">#ffe54046</color>

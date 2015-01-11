@@ -10,6 +10,7 @@ public class Player {
     private int matchesWon;
     private int matchesLost;
     private int scoresHit[][];
+    private int totalThrows;
     private int bullsHit[];
     private int turnsPlayed;
     private int gamesPlayed;
@@ -31,7 +32,7 @@ public class Player {
     }
 
     public Player(String name, int highestScore, int lowestScore, int matchesWon, int matchesLost,
-                  int[][] scoresHit, int[] bullsHit, int turnsPlayed, int gamesPlayed) {
+                  int[][] scoresHit, int totalThrows, int[] bullsHit, int turnsPlayed, int gamesPlayed) {
         this.name = name;
         this.highestScore = highestScore;
         this.lowestScore = lowestScore;
@@ -42,6 +43,7 @@ public class Player {
                 this.scoresHit[i][j] = scoresHit[i][j];
             }
         }
+        this.totalThrows = totalThrows;
         this.bullsHit[0] = bullsHit[0];
         this.bullsHit[1] = bullsHit[1];
         this.turnsPlayed = turnsPlayed;
@@ -94,6 +96,14 @@ public class Player {
 
     public void setScoresHit(int score, int multiplier, int value) {
         this.scoresHit[score][multiplier] = value;
+    }
+
+    public int getTotalThrows() {
+        return totalThrows;
+    }
+
+    public void setTotalThrows(int totalThrows) {
+        this.totalThrows = totalThrows;
     }
 
     public int[] getBullsHit() {

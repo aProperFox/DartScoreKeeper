@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/game_over_layout"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_dialog">
+
+    <View
+        android:id="@+id/center_view"
+        android:layout_width="fill_parent"
+        android:layout_height="0sp"
+        android:layout_centerVertical="true"/>
+
+    <TextView
+        android:id="@+id/exit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/center_view"
+        android:text="Settings"
+        android:textColor="#b3b3b3"
+        android:textSize="40sp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginTop="5sp"
+        android:layout_marginBottom="5sp"/>
+    <CheckBox
+        android:id="@+id/enable_taunts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enable Taunts"
+        android:onClick="onConfirm"
+        android:textSize="25sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/center_view"
+        android:textColor="#b3b3b3"/>
+
+    <games.ride.car.dartscorekeeper.PieView
+        android:id="@+id/custView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        custom:circleColor="#ff0099"
+        custom:circleLabel="Hello"
+        custom:labelColor="#ffff66" />
+
+</RelativeLayout>

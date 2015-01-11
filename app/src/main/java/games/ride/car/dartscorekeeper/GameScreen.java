@@ -2,10 +2,10 @@ package games.ride.car.dartscorekeeper;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -17,8 +17,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +33,8 @@ import java.util.Random;
 
 public class GameScreen extends Activity {
 
-    protected int turn;
+    protected int teamTurn;
+    protected int playerTurn;
     protected int buttonsPressed;
     protected boolean isGameOver;
 
@@ -47,8 +52,6 @@ public class GameScreen extends Activity {
             "That's okay... I didn't expect much from you"};
     protected int tauntsIterator;
 
-    protected boolean hitSomething;
-
     private Vibrator myVib;
 
     protected String closed = "(X)";
@@ -57,7 +60,84 @@ public class GameScreen extends Activity {
     protected View exitView;
     protected View endView;
 
+    protected Dialog overlayDialog;
+    protected View overlayView;
+
     protected int disabledPlayer;
+
+    protected static enum Score {
+        TWENTY, NINETEEN, EIGHTEEN, SEVENTEEN, SIXTEEN, FIFTEEN, BULL, NONE
+    }
+
+    public int getPoint(Score score) {
+        if(score == Score.TWENTY)
+            return 20;
+        else if(score == Score.NINETEEN)
+            return 19;
+        else if(score == Score.EIGHTEEN)
+            return 18;
+        else if(score == Score.SEVENTEEN)
+            return 17;
+        else if(score == Score.SIXTEEN)
+            return 16;
+        else if(score == Score.FIFTEEN)
+            return 15;
+        else if(score == Score.BULL)
+            return 25;
+        else
+            return 0;
+    }
+    public Score getScore(String score) {
+        if(score.equals("20"))
+            return Score.TWENTY;
+        else if(score.equals("19"))
+            return Score.NINETEEN;
+        else if(score.equals("18"))
+            return Score.EIGHTEEN;
+        else if(score.equals("17"))
+            return Score.SEVENTEEN;
+        else if(score.equals("16"))
+            return Score.SIXTEEN;
+        else if(score.equals("15"))
+            return Score.FIFTEEN;
+        else if(score.equals("bull"))
+            return Score.BULL;
+        else
+            return null;
+    }
+
+    public String getScoreName(Score score) {
+        if(score == Score.TWENTY)
+            return "20";
+        else if(score == Score.NINETEEN)
+            return "19";
+        else if(score == Score.EIGHTEEN)
+            return "18";
+        else if(score == Score.SEVENTEEN)
+            return "17";
+        else if(score == Score.SIXTEEN)
+            return "16";
+        else if(score == Score.FIFTEEN)
+            return "15";
+        else if(score == Score.BULL)
+            return "bull";
+        else
+            return null;
+    }
+
+    protected static final class Turn {
+        public Score score[] = new Score[3];
+        public int multiplier[] = new int[3];
+        public Turn() {
+            score[0] = score[1] = score[2] = Score.NONE;
+            multiplier[0] = multiplier[1] = multiplier[2] = 0;
+        }
+    }
+    protected ArrayList<Turn> turns = new ArrayList<Turn>();
+    protected Turn currentTurn;
+
+    protected String[] scores = new String[3];
+    protected int dartsLeft;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,29 +145,32 @@ public class GameScreen extends Activity {
 
         initializeGame();
 
-
     }
 
     public void initializeGame() {
 
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.game_screen_landscape);
+        } else {
+            setContentView(R.layout.game_screen_portrait);
+
+        }
+
         if(MainMenu.PLAYERS == 3) {
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                setContentView(R.layout.activity_game_screen_3_columns_landscape);
-            } else {
-                setContentView(R.layout.activity_game_screen_3_columns_portrait);
-            }
+            TextView extraName = (TextView) findViewById(R.id.team2_player2_name);
+            extraName.setVisibility(View.GONE);
+            extraName = (TextView) findViewById(R.id.team1_player2_name);
+            extraName.setVisibility(View.GONE);
+
         }
         else {
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                setContentView(R.layout.activity_game_screen_2_columns_landscape);
-            } else {
-                setContentView(R.layout.activity_game_screen_2_columns_portrait);
-            }
+            LinearLayout column_3 = (LinearLayout) findViewById(R.id.team_3_column);
+            column_3.setVisibility(View.GONE);
 
             if(MainMenu.PLAYERS == 2) {
-                TextView extraName = (TextView) findViewById(R.id.player3_name);
+                TextView extraName = (TextView) findViewById(R.id.team2_player2_name);
                 extraName.setVisibility(View.GONE);
-                extraName = (TextView) findViewById(R.id.player4_name);
+                extraName = (TextView) findViewById(R.id.team1_player2_name);
                 extraName.setVisibility(View.GONE);
             }
         }
@@ -95,9 +178,10 @@ public class GameScreen extends Activity {
         disabledPlayer = 0;
 
         setPlayerNames();
-        turn = 1;
+        teamTurn = 1;
+        playerTurn = 1;
 
-        TextView activePlayer = (TextView) findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
+        TextView activePlayer = (TextView) findViewById(getResources().getIdentifier("team" + teamTurn + "_player" + playerTurn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
 
         buttonsPressed = 0;
@@ -128,70 +212,35 @@ public class GameScreen extends Activity {
 
         connectToTTS();
 
-        hitSomething = false;
-
         myVib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
 
         randomizeArray(taunts);
         tauntsIterator = 0;
 
+        scores[0] = "";
+        scores[1] = "";
+        scores[2] = "";
+        dartsLeft = 3;
+
+        currentTurn = new Turn();
+
         initializeDialog();
     }
 
-    public void onTeamScore(View view) {
+    public void onTeamScore(Score point, int multiplier) {
         if(isGameOver) {
             return;
         }
 
-        TextView textView = (TextView) view;
+        TextView textView = (TextView) findViewById(getResources().getIdentifier("team_" + teamTurn + "_" + getScoreName(point), "id", getPackageName()));
 
         String team = getResources().getResourceName(textView.getId());
         team = team.substring(team.lastIndexOf('/') + 1, team.lastIndexOf('_'));
 
         int teamId = Integer.parseInt(team.substring(team.lastIndexOf('_') + 1));
-        int turn = this.turn;
+        int turn = this.teamTurn;
 
-        if(MainMenu.PLAYERS == 4) {
-            if(turn == 2 || turn == 3)
-                turn = 2;
-            else
-                turn = 1;
-        }
-
-
-        if(teamId != turn) {
-            Context context = getApplicationContext();
-            CharSequence text = "It's not your turn!";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-            return;
-        }
-
-        buttonsPressed ++;
-        if(buttonsPressed > 9) {
-            Context context = getApplicationContext();
-            CharSequence text = "You couldn't have scored that many!";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-            return;
-        }
-
-        hitSomething = true;
-
-        String scoreName = getResources().getResourceName(textView.getId());
-        scoreName = scoreName.substring(scoreName.lastIndexOf('_') + 1);
-
-        int hitPoints = 0;
-
-        if(scoreName.equals("bull")) {
-            hitPoints = 25;
-        } else {
-            hitPoints = Integer.parseInt(scoreName);
-        }
+        String scoreName = getScoreName(point);
 
         String scoreHit = teamScores.get(turn-1).get(scoreName);
 
@@ -210,75 +259,127 @@ public class GameScreen extends Activity {
         }
 
         int newScore = 0;
+        int leftOver = 0;
+
+        String newText = closed;
 
         if(timesHit == 0) {
+            switch(multiplier) {
+                case 1:
+                    newText = "/";
+                    break;
+                case 2:
+                    newText = "X";
+                    break;
+                case 3:
+                    break;
+                default:
+                    break;
+            }
 
-            teamScores.get(turn - 1).put(scoreName, "/");
-            textView.setText("/");
 
         } else if(timesHit == 1) {
-
-            teamScores.get(turn - 1).put(scoreName, "X");
-            textView.setText("X");
-
+            switch(multiplier) {
+                case 1:
+                    newText = "X";
+                    break;
+                case 2:
+                    newText = closed;
+                    break;
+                case 3:
+                    leftOver = 1;
+                    break;
+                default:
+                    break;
+            }
         } else if(timesHit == 2) {
-
-            teamScores.get(turn - 1).put(scoreName, closed);
-            textView.setText(closed);
+            switch(multiplier) {
+                case 1:
+                    newText = closed;
+                    break;
+                case 2:
+                    leftOver = 1;
+                    break;
+                case 3:
+                    leftOver = 2;
+                    break;
+                default:
+                    break;
+            }
 
         } else {
+            switch(multiplier) {
+                case 1:
+                    leftOver = 1;
+                    break;
+                case 2:
+                    leftOver = 2;
+                    break;
+                case 3:
+                    leftOver = 3;
+                    break;
+                default:
+                    break;
+            }
+        }
 
-            if(MainMenu.PLAYERS == 3) {
+        teamScores.get(turn - 1).put(scoreName, newText);
+        textView.setText(newText);
 
-                TextView score = new TextView(this);
+        if(MainMenu.PLAYERS == 3) {
 
-                for(int i = 1; i < 4; i++) {
-                    if(i != turn && i != disabledPlayer) {
+            TextView score = new TextView(this);
 
-                        String scoreClosed = teamScores.get(i-1).get(scoreName);
+            for(int i = 1; i < 4; i++) {
+                if(i != turn && i != disabledPlayer) {
 
-                        if(scoreClosed == null || scoreClosed != closed) {
+                    String scoreClosed = teamScores.get(i-1).get(scoreName);
 
-                            score = (TextView) findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
+                    if(scoreClosed == null || scoreClosed != closed) {
 
-                            newScore = Integer.parseInt(score.getText().toString());
-                            newScore += hitPoints;
+                        score = (TextView) findViewById(getResources().getIdentifier("team_" + i + "_score", "id", getPackageName()));
 
-                            score.setText("" + newScore);
-                            teamScores.get(i-1).put("score", "" + newScore);
-                        }
+                        newScore = (getPoint(point) * leftOver) + Integer.parseInt(score.getText().toString());
 
+                        score.setText("" + newScore);
+                        teamScores.get(i-1).put("score", "" + newScore);
                     }
-                }
 
-
-            } else {
-                int otherTeam = (turn == 1)? 2: 1;
-                String scoreClosed = teamScores.get(otherTeam-1).get(scoreName);
-
-                if(scoreClosed == null || scoreClosed != closed) {
-
-                    String teamScoreId = team + "_score";
-
-                    TextView score = (TextView) findViewById(getResources().getIdentifier(teamScoreId, "id", getPackageName()));
-
-                    newScore = Integer.parseInt(score.getText().toString());
-                    newScore += hitPoints;
-
-                    score.setText("" + newScore);
-                    teamScores.get(turn-1).put("score", "" + newScore);
                 }
             }
 
 
+        } else {
+            int otherTeam = (turn == 1)? 2: 1;
+            String scoreClosed = teamScores.get(otherTeam-1).get(scoreName);
 
+            if(scoreClosed == null || scoreClosed != closed) {
+
+                String teamScoreId = team + "_score";
+
+                TextView score = (TextView) findViewById(getResources().getIdentifier(teamScoreId, "id", getPackageName()));
+
+                newScore = (getPoint(point) * leftOver) + Integer.parseInt(score.getText().toString());
+
+                score.setText("" + newScore);
+                teamScores.get(turn-1).put("score", "" + newScore);
+            }
         }
+
+
 
     }
 
+
     public void endTurn(View view) {
 
+        overlayDialog.cancel();
+
         myVib.vibrate(50);
+
+        for(int i = 0; i < 3-dartsLeft; i++) {
+            onTeamScore(currentTurn.score[i], currentTurn.multiplier[i]);
+        }
 
         checkForWin();
 
@@ -287,50 +388,84 @@ public class GameScreen extends Activity {
         }
 
         if(MainMenu.PLAYERS == 4) {
-            if(turn == 1) {
-                turn = 2;
-            } else if(turn == 2) {
-                turn = 4;
-            } else if(turn == 3){
-                turn = 1;
+            if(teamTurn == 1 && playerTurn == 1) {
+                teamTurn = 2;
+            } else if(teamTurn == 2 && playerTurn == 1) {
+                teamTurn = 1;
+                playerTurn = 2;
+            } else if(teamTurn == 1 && playerTurn == 2){
+                teamTurn = 2;
             } else {
-                turn = 3;
+                teamTurn = 1;
+                playerTurn = 1;
             }
         } else {
-            turn++;
-            if(turn > MainMenu.PLAYERS) {
-                turn = 1;
+            teamTurn++;
+            if(teamTurn > MainMenu.PLAYERS) {
+                teamTurn = 1;
             }
-            if(turn == disabledPlayer) {
-                turn++;
-                if(turn > MainMenu.PLAYERS) {
-                    turn = 1;
+            if(teamTurn == disabledPlayer) {
+                teamTurn++;
+                if(teamTurn > MainMenu.PLAYERS) {
+                    teamTurn = 1;
                 }
             }
         }
 
-        TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
-        activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
-
+        TextView activePlayer;
         for(int i = 1; i <= MainMenu.PLAYERS; i++) {
-            if(i != turn) {
-                activePlayer = (TextView) findViewById(getResources().getIdentifier("player" + i + "_name", "id", getPackageName()));
-                activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.light));
+            if(i != teamTurn) {
+                if(MainMenu.PLAYERS == 4) {
+                    if(i == 3) {
+                        activePlayer = (TextView) findViewById(getResources().getIdentifier("team2_player2_name", "id", getPackageName()));
+                        activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.light));
+                    } else if(i == 4) {
+                        activePlayer = (TextView) findViewById(getResources().getIdentifier("team1_player2_name", "id", getPackageName()));
+                        activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.light));
+                    } else {
+                        activePlayer = (TextView) findViewById(getResources().getIdentifier("team" + i + "_player1_name", "id", getPackageName()));
+                        activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.light));
+                    }
+                } else {
+                    activePlayer = (TextView) findViewById(getResources().getIdentifier("team" + i + "_player1_name", "id", getPackageName()));
+                    activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.light));
+                }
             }
         }
 
+        activePlayer = (TextView)findViewById(getResources().getIdentifier("team" + teamTurn + "_player" + playerTurn + "_name", "id", getPackageName()));
+        activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
 
-        if(!hitSomething) {
+        if(dartsLeft == 3) {
             if(getSharedPreferences(MainMenu.PREFERENCES, 0).getBoolean("allowTaunts", true)) {
                 if(tauntsIterator >= taunts.length)
                     tauntsIterator = 0;
                 ttobj.speak(taunts[tauntsIterator], TextToSpeech.QUEUE_FLUSH, null);
             }
             tauntsIterator++;
+        } else {
+            Button button = new Button(this);
+            Resources resources = getResources();
+            ImageView imageView = new ImageView(this);
+            for(int i = 0; i < 3; i++) {
+                if(!scores[i].equals("")) {
+                    button = (Button) overlayView.findViewById(getResources().getIdentifier(scores[i], "id", getPackageName()));
+                    button.setBackgroundDrawable(resources.getDrawable(R.drawable.mult_0));
+                }
+                imageView = (ImageView) overlayView.findViewById(getResources().getIdentifier("dart_" + (i + 1), "id", getPackageName()));
+                imageView.setVisibility(View.VISIBLE);
+            }
+            scores[0] = "";
+            scores[1] = "";
+            scores[2] = "";
+            dartsLeft = 3;
         }
 
+        turns.add(currentTurn);
+        currentTurn = new Turn();
+
         buttonsPressed = 0;
-        hitSomething = false;
+
 
         tempState = new ArrayList<HashMap<String, String>>();
         for(HashMap<String, String> hm: teamScores) {
@@ -340,14 +475,8 @@ public class GameScreen extends Activity {
     }
 
     public void checkForWin() {
-        int turn = this.turn;
-        if(MainMenu.PLAYERS == 4) {
-            if(turn == 2 || turn == 3) {
-                turn = 2;
-            } else {
-                turn = 1;
-            }
-        }
+        int turn = this.teamTurn;
+
         int score = Integer.parseInt(teamScores.get(turn-1).get("score"));
 
         HashMap<String, String> playerMap = teamScores.get(turn-1);
@@ -411,11 +540,8 @@ public class GameScreen extends Activity {
                         hasWon = false;
                     } else if(Integer.parseInt(teamScores.get(i-1).get("score")) > score && disabledPlayer == 0) {
                         disabledPlayer = i;
-                        TextView disabled = new TextView(this);
-                        for(int j = 0; j < scoreNames.length; j++) {
-                            disabled = (TextView)findViewById(getResources().getIdentifier("team_" + i + "_" + scoreNames[j], "id", getPackageName()));
+                            LinearLayout disabled = (LinearLayout)findViewById(getResources().getIdentifier("team_" + i + "_column", "id", getPackageName()));
                             disabled.setAlpha(0.25f);
-                        }
                     }
                 }
                 if(!hasWon)
@@ -490,23 +616,20 @@ public class GameScreen extends Activity {
         // Layout inflater to help inflate a view for the dialog when the game is over
         LayoutInflater inflater = LayoutInflater.from(GameScreen.this);
         exitView = inflater.inflate(R.layout.dialog_exit, null);
+        endView = inflater.inflate(R.layout.dialog_end_game, null);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             exitView.setMinimumHeight((int) (screenHeight * 0.9f));
             exitView.setMinimumWidth((int) (screenWidth * 0.6f));
+            endView.setMinimumHeight((int) (screenHeight * 0.9f));
+            endView.setMinimumWidth((int) (screenWidth * 0.6f));
+            overlayView = inflater.inflate(R.layout.dialog_scores_landscape, null);
         } else {
             exitView.setMinimumWidth((int) (screenWidth * 0.9f));
             exitView.setMinimumHeight((int) (screenHeight * 0.6f));
-        }
-
-        endView = inflater.inflate(R.layout.dialog_end_game, null);
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            endView.setMinimumHeight((int) (screenHeight * 0.9f));
-            endView.setMinimumWidth((int) (screenWidth * 0.6f));
-        } else {
             endView.setMinimumWidth((int) (screenWidth * 0.9f));
             endView.setMinimumHeight((int) (screenHeight * 0.6f));
+            overlayView = inflater.inflate(R.layout.dialog_scores_portrait, null);
         }
-
 
         // Instantiate the end dialog for when the game is over
         endDialog = new Dialog( GameScreen.this, android.R.style.Theme_Translucent );
@@ -533,6 +656,14 @@ public class GameScreen extends Activity {
                 return true;
             }
         });
+        overlayView.setMinimumHeight(screenHeight);
+        overlayView.setMinimumWidth(screenWidth);
+
+        overlayDialog = new Dialog(GameScreen.this, android.R.style.Theme_Translucent);
+        overlayDialog.getWindow().setLayout(screenWidth, screenHeight);
+        overlayDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        overlayDialog.setContentView(overlayView);
+        overlayDialog.getWindow().getAttributes().windowAnimations = R.style.Fade;
     }
 
     @Override
@@ -589,7 +720,7 @@ public class GameScreen extends Activity {
     }
 
     public void undoMoves(View view) {
-        int turn = this.turn;
+        int turn = this.teamTurn;
         if(MainMenu.PLAYERS == 4) {
             if(turn == 3 || turn == 2) {
                 turn = 2;
@@ -638,43 +769,138 @@ public class GameScreen extends Activity {
 
     }
 
+    public void openSettings(View view) {
+
+    }
+
+    public void onPressScore(View view) {
+        if(dartsLeft > 0) {
+            Button button = (Button) view;
+            Resources resources = getResources();
+            String scoreName = getResources().getResourceName(button.getId());
+            scores[3-dartsLeft] = scoreName;
+            currentTurn.score[3-dartsLeft] = getScore(scoreName.substring(scoreName.lastIndexOf("t") + 1, scoreName.lastIndexOf("x")));
+            currentTurn.multiplier[3-dartsLeft] = Integer.parseInt(scoreName.substring(scoreName.length()-1));
+
+            int hits = 0;
+            for(int i = 0; i < 3; i++) {
+                if(scoreName.equals(scores[i]))
+                    hits++;
+            }
+            switch (hits) {
+                case 1:
+                    button.setBackgroundDrawable(resources.getDrawable(R.drawable.mult_1));
+                    break;
+                case 2:
+                    button.setBackgroundDrawable(resources.getDrawable(R.drawable.mult_2));
+                    break;
+                case 3:
+                    button.setBackgroundDrawable(resources.getDrawable(R.drawable.mult_3));
+                    break;
+                default:
+                    button.setBackgroundDrawable(resources.getDrawable(R.drawable.mult_0));
+                    break;
+            }
+            ImageView imageView = (ImageView) overlayView.findViewById(getResources().getIdentifier("dart_" + dartsLeft, "id", getPackageName()));
+            imageView.setVisibility(View.INVISIBLE);
+            dartsLeft--;
+        }
+    }
+
+    public void undoScore(View view) {
+        if(dartsLeft < 3) {
+            Resources resources = getResources();
+            Button button = (Button) overlayView.findViewById(resources.getIdentifier(scores[2 - dartsLeft], "id", getPackageName()));
+            if(dartsLeft == 0) {
+
+            } else if (dartsLeft == 1) {
+
+            } else {
+
+            }
+            CharSequence sequence = scores[0] + "," + scores[1] + "," + scores[2];
+            int count = StringUtils.countMatches(sequence, scores[2-dartsLeft]);
+            switch (count) {
+                case 1:
+                    button.setBackgroundDrawable(resources.getDrawable(R.drawable.mult_0));
+                    break;
+                case 2:
+                    button.setBackgroundDrawable(resources.getDrawable(R.drawable.mult_1));
+                    break;
+                case 3:
+                    button.setBackgroundDrawable(resources.getDrawable(R.drawable.mult_2));
+                    break;
+                default:
+                    break;
+            }
+            scores[2 - dartsLeft] = "";
+            ImageView imageView = (ImageView) overlayView.findViewById(getResources().getIdentifier("dart_" + (dartsLeft+1), "id", getPackageName()));
+            imageView.setVisibility(View.VISIBLE);
+            dartsLeft++;
+        } else {
+            overlayDialog.cancel();
+        }
+    }
+
+    public void enterScore(View view) {
+        overlayDialog.show();
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if(MainMenu.PLAYERS == 3) {
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                setContentView(R.layout.activity_game_screen_3_columns_landscape);
-
-            } else {
-                setContentView(R.layout.activity_game_screen_3_columns_portrait);
-            }
-
+        LayoutInflater inflater = LayoutInflater.from(GameScreen.this);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.game_screen_landscape);
+            overlayView = inflater.inflate(R.layout.dialog_scores_landscape, null);
         } else {
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                setContentView(R.layout.activity_game_screen_2_columns_landscape);
+            setContentView(R.layout.game_screen_portrait);
+            overlayView = inflater.inflate(R.layout.dialog_scores_portrait, null);
+        }
 
-            } else {
-                setContentView(R.layout.activity_game_screen_2_columns_portrait);
-            }
+        Resources resources = getResources();
+        String packageName = getPackageName();
+        String[] tempScores = new String[3];
+        for(int i = 0; i < 3; i++) {
+            tempScores[i] = scores[i];
+        }
 
-            if(MainMenu.PLAYERS == 2) {
-                TextView extraName = (TextView) findViewById(R.id.player3_name);
-                extraName.setVisibility(View.GONE);
-                extraName = (TextView) findViewById(R.id.player4_name);
-                extraName.setVisibility(View.GONE);
+        scores[0] = scores[1] = scores[2] = "";
+        dartsLeft = 3;
+        for(int i = 0; i < 3; i++) {
+            if(tempScores[i].contains(packageName)) {
+                onPressScore(overlayView.findViewById(resources.getIdentifier(tempScores[i], "id", packageName)));
             }
         }
 
-        TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("player" + turn + "_name", "id", getPackageName()));
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int screenWidth = size.x;
+        int screenHeight = size.y;
+
+        overlayDialog.getWindow().setLayout(screenWidth, screenHeight);
+        overlayDialog.setContentView(overlayView);
+
+        if(MainMenu.PLAYERS != 3) {
+            LinearLayout column_3 = (LinearLayout) findViewById(R.id.team_3_column);
+            column_3.setVisibility(View.GONE);
+        }
+
+        if(MainMenu.PLAYERS == 2 || MainMenu.PLAYERS == 3) {
+            TextView extraName = (TextView) findViewById(R.id.team2_player2_name);
+            extraName.setVisibility(View.GONE);
+            extraName = (TextView) findViewById(R.id.team1_player2_name);
+            extraName.setVisibility(View.GONE);
+        }
+
+        TextView activePlayer = (TextView)findViewById(getResources().getIdentifier("team" + teamTurn + "_player" + playerTurn + "_name", "id", getPackageName()));
         activePlayer.setBackgroundDrawable(getResources().getDrawable(R.color.active));
 
         if(disabledPlayer != 0) {
-            TextView disabled = new TextView(this);
-            for(int j = 0; j < scoreNames.length; j++) {
-                disabled = (TextView) findViewById(getResources().getIdentifier("team_" + disabledPlayer + "_" + scoreNames[j], "id", getPackageName()));
-                disabled.setAlpha(0.25f);
-            }
+            LinearLayout disabled = (LinearLayout) findViewById(getResources().getIdentifier("team_" + disabledPlayer + "_column", "id", getPackageName()));
+            disabled.setAlpha(0.25f);
         }
 
         // Re-initialze view
@@ -717,21 +943,21 @@ public class GameScreen extends Activity {
 
         SharedPreferences preferences = getSharedPreferences(MainMenu.PREFERENCES, 0);
 
-        TextView player1 = (TextView)findViewById(R.id.player1_name), player2 = (TextView)findViewById(R.id.player2_name);
+        TextView player1 = (TextView)findViewById(R.id.team1_player1_name), player2 = (TextView)findViewById(R.id.team2_player1_name);
 
         player1.setText(preferences.getString("Player 1", "Player 1"));
         player2.setText(preferences.getString("Player 2", "Player 2"));
 
         if(MainMenu.PLAYERS == 3) {
-            TextView player3 = (TextView)findViewById(R.id.player3_name);
+            TextView player3 = (TextView)findViewById(R.id.team3_player1_name);
             player3.setText(preferences.getString("Player 3", "Player 3"));
         }
         else {
 
             if(MainMenu.PLAYERS == 4) {
-                TextView player3 = (TextView)findViewById(R.id.player3_name);
+                TextView player3 = (TextView)findViewById(R.id.team2_player2_name);
                 player3.setText(preferences.getString("Player 3", "Player 3"));
-                TextView player4 = (TextView)findViewById(R.id.player4_name);
+                TextView player4 = (TextView)findViewById(R.id.team1_player2_name);
                 player4.setText(preferences.getString("Player 4", "Player 4"));
             }
         }
